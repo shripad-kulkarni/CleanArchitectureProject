@@ -14,7 +14,6 @@
 	  <Folder Include="DTOs\" />
 	  <Folder Include="Mappers\" />
 	  <Folder Include="Validators\" />
-	  <Folder Include="Specifications\" />
 	  <Folder Include="Services\" />
 	</ItemGroup>
 
