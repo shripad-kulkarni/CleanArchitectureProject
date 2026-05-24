@@ -1,0 +1,24 @@
+﻿namespace Project.API.DependencyInjection
+{
+    public static class PresentationServiceRegistration
+    {
+        public static IServiceCollection AddPresentationServices(
+            this IServiceCollection services,
+            IConfiguration configuration)
+        {
+            services.AddControllers();
+            services.AddEndpointsApiExplorer();
+
+            services.AddApiVersioningConfig();
+            services.AddSwaggerConfig();
+            services.AddCorsPolicies(configuration);
+
+            services.AddExceptionHandler<GlobalExceptionHandler>();
+            services.AddProblemDetails();
+
+            services.AddHttpContextAccessor();
+
+            return services;
+        }
+    }
+}
