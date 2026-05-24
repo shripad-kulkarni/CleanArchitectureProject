@@ -9,17 +9,9 @@ using Project.Application.Abstractions.ExternalServices;
 using Project.Application.Abstractions.Identity;
 using Project.Application.Abstractions.Persistence;
 using Project.Application.Abstractions.Services;
-using Project.Infrastructure.Repositories;
-using Project.Application.DTOs.Expense;
-using Project.Application.DTOs.Fee;
-using Project.Application.DTOs.Salary;
-using Project.Application.DTOs.Staff;
+using Project.Infrastructure.Repositories; 
 using Project.Application.DTOs.Student;
-using Project.Application.Services;
-using Project.Application.Validators.Expense;
-using Project.Application.Validators.Fee;
-using Project.Application.Validators.Salary;
-using Project.Application.Validators.Staff;
+using Project.Application.Services; 
 using Project.Application.Validators.Student;
 using Project.Infrastructure.DbInitializers;
 using Project.Infrastructure.Identity;
@@ -117,27 +109,14 @@ namespace Project.Infrastructure.DependencyInjection
             services.AddScoped<IFileStorageService, LocalFileStorageService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddSingleton<IPdfGeneratorService, QuestPdfGeneratorService>();
-            services.AddSingleton<IStudentExportService, StudentExportService>();
-            services.AddSingleton<IExpenseExportService, ExpenseExportService>();
-            services.AddSingleton<ILeaveExportService, LeaveExportService>();
+            services.AddSingleton<IStudentExportService, StudentExportService>(); 
             services.AddScoped<IDbInitializer, DbInitializer>();
 
             // Validators
-            services.AddScoped<IValidator<CreateStudentDto>, CreateStudentValidator>();
-            services.AddScoped<IValidator<CreateStaffDto>, CreateStaffValidator>();
-            services.AddScoped<IValidator<CreateFeeDto>, CreateFeeValidator>();
-            services.AddScoped<IValidator<CollectFeeDto>, CollectFeeValidator>();
-            services.AddScoped<IValidator<CreateSalaryDto>, CreateSalaryValidator>();
-            services.AddScoped<IValidator<CreateExpenseDto>, CreateExpenseValidator>();
+            services.AddScoped<IValidator<CreateStudentDto>, CreateStudentValidator>(); 
 
             // Application services
-            services.AddScoped<IStudentService, StudentService>();
-            services.AddScoped<IStaffService, StaffService>();
-            services.AddScoped<IFeeService, FeeService>();
-            services.AddScoped<IAttendanceService, AttendanceService>();
-            services.AddScoped<ILeaveService, LeaveService>();
-            services.AddScoped<ISalaryService, SalaryService>();
-            services.AddScoped<IExpenseService, ExpenseService>();
+            services.AddScoped<IStudentService, StudentService>(); 
             services.AddScoped<IMenuSettingRepository, MenuSettingRepository>();
             services.AddScoped<IMenuSettingService, MenuSettingService>();
             services.AddScoped<ISchoolSettingsService, SchoolSettingsService>();

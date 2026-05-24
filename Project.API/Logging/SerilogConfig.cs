@@ -1,4 +1,6 @@
-﻿namespace Project.API.Logging
+﻿using Serilog;
+
+namespace Project.API.Logging
 {
     public static class SerilogConfig
     {

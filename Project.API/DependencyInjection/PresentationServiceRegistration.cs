@@ -1,4 +1,8 @@
-﻿namespace Project.API.DependencyInjection
+﻿using Project.API.Extensions;
+using Project.API.Handlers;
+using Project.API.Versioning;
+
+namespace Project.API.DependencyInjection
 {
     public static class PresentationServiceRegistration
     {

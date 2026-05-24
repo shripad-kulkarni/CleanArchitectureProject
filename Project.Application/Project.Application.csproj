@@ -11,10 +11,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Validators\" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <ProjectReference Include="..\Project.Domain\Project.Domain.csproj" />
 	</ItemGroup>
 

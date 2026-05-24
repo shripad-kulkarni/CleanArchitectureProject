@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Project.Domain.Exceptions;
 using System.Net;
 
 namespace Project.API.Handlers

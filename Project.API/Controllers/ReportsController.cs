@@ -4,8 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Project.API.CustomResults;
 using Project.Application.Abstractions.ExternalServices;
 using Project.Application.Abstractions.Services;
-using Project.Application.Common.Errors;
-using Project.Application.DTOs.Expense;
+using Project.Application.Common.Errors; 
 using Project.Application.DTOs.Report;
 using Project.Application.DTOs.Settings;
 
@@ -18,30 +17,18 @@ namespace Project.API.Controllers
     public sealed class ReportsController : ControllerBase
     {
         private readonly IStudentService _studentService;
-        private readonly IStudentExportService _studentExportService;
-        private readonly IExpenseService _expenseService;
-        private readonly IExpenseExportService _expenseExportService;
-        private readonly ILeaveService _leaveService;
-        private readonly ILeaveExportService _leaveExportService;
+        private readonly IStudentExportService _studentExportService; 
         private readonly ISchoolSettingsService _settingsService;
         private readonly IWebHostEnvironment _env;
 
         public ReportsController(
             IStudentService studentService,
-            IStudentExportService studentExportService,
-            IExpenseService expenseService,
-            IExpenseExportService expenseExportService,
-            ILeaveService leaveService,
-            ILeaveExportService leaveExportService,
+            IStudentExportService studentExportService, 
             ISchoolSettingsService settingsService,
             IWebHostEnvironment env)
         {
             _studentService = studentService;
-            _studentExportService = studentExportService;
-            _expenseService = expenseService;
-            _expenseExportService = expenseExportService;
-            _leaveService = leaveService;
-            _leaveExportService = leaveExportService;
+            _studentExportService = studentExportService; 
             _settingsService = settingsService;
             _env = env;
         }
@@ -94,122 +81,7 @@ namespace Project.API.Controllers
                 "application/msword", "StudentsReport.doc");
         }
 
-        // ── Expenses ─────────────────────────────────────────────────────────
-
-        [HttpGet("expenses")]
-        public async Task<IActionResult> GetExpenses(
-            [FromQuery] string? category,
-            [FromQuery] DateOnly? fromDate,
-            [FromQuery] DateOnly? toDate,
-            CancellationToken ct)
-        {
-            var result = await _expenseService.GetReportDataAsync(
-                new ExpenseFilterDto(category, fromDate, toDate), ct);
-            if (result.IsFailure) return StatusCode(500, ApiResponse.Failure(result.Error.Message));
-            return Ok(ApiResponse<IReadOnlyList<ExpenseDto>>.Success(result.Value));
-        }
-
-        [HttpGet("expenses/export/pdf")]
-        public async Task<IActionResult> ExportExpensesPdf(
-            [FromQuery] string? category, [FromQuery] DateOnly? fromDate, [FromQuery] DateOnly? toDate,
-            CancellationToken ct)
-        {
-            var result = await _expenseService.GetReportDataAsync(
-                new ExpenseFilterDto(category, fromDate, toDate), ct);
-            if (result.IsFailure) return StatusCode(500, ApiResponse.Failure(result.Error.Message));
-            var header = await BuildHeaderAsync(ct);
-            return File(_expenseExportService.ExportPdf(result.Value, category, fromDate, toDate, header),
-                "application/pdf", "ExpensesReport.pdf");
-        }
-
-        [HttpGet("expenses/export/excel")]
-        public async Task<IActionResult> ExportExpensesExcel(
-            [FromQuery] string? category, [FromQuery] DateOnly? fromDate, [FromQuery] DateOnly? toDate,
-            CancellationToken ct)
-        {
-            var result = await _expenseService.GetReportDataAsync(
-                new ExpenseFilterDto(category, fromDate, toDate), ct);
-            if (result.IsFailure) return StatusCode(500, ApiResponse.Failure(result.Error.Message));
-            var header = await BuildHeaderAsync(ct);
-            return File(_expenseExportService.ExportExcel(result.Value, category, fromDate, toDate, header),
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "ExpensesReport.xlsx");
-        }
-
-        [HttpGet("expenses/export/word")]
-        public async Task<IActionResult> ExportExpensesWord(
-            [FromQuery] string? category, [FromQuery] DateOnly? fromDate, [FromQuery] DateOnly? toDate,
-            CancellationToken ct)
-        {
-            var result = await _expenseService.GetReportDataAsync(
-                new ExpenseFilterDto(category, fromDate, toDate), ct);
-            if (result.IsFailure) return StatusCode(500, ApiResponse.Failure(result.Error.Message));
-            var header = await BuildHeaderAsync(ct);
-            return File(_expenseExportService.ExportWord(result.Value, category, fromDate, toDate, header),
-                "application/msword", "ExpensesReport.doc");
-        }
-
-        // ── Leaves ───────────────────────────────────────────────────────────
-
-        [HttpGet("leaves")]
-        public async Task<IActionResult> GetLeaves(
-            [FromQuery] string? status,
-            [FromQuery] string? leaveType,
-            [FromQuery] DateOnly? fromDate,
-            [FromQuery] DateOnly? toDate,
-            [FromQuery] int? staffId,
-            CancellationToken ct)
-        {
-            var result = await _leaveService.GetReportDataAsync(
-                new LeaveReportQueryDto(status, leaveType, fromDate, toDate, staffId), ct);
-            if (result.IsFailure) return StatusCode(500, ApiResponse.Failure(result.Error.Message));
-            return Ok(ApiResponse<IReadOnlyList<LeaveReportRowDto>>.Success(result.Value));
-        }
-
-        [HttpGet("leaves/export/pdf")]
-        public async Task<IActionResult> ExportLeavesPdf(
-            [FromQuery] string? status, [FromQuery] string? leaveType,
-            [FromQuery] DateOnly? fromDate, [FromQuery] DateOnly? toDate,
-            [FromQuery] int? staffId,
-            CancellationToken ct)
-        {
-            var query = new LeaveReportQueryDto(status, leaveType, fromDate, toDate, staffId);
-            var result = await _leaveService.GetReportDataAsync(query, ct);
-            if (result.IsFailure) return StatusCode(500, ApiResponse.Failure(result.Error.Message));
-            var header = await BuildHeaderAsync(ct);
-            return File(_leaveExportService.ExportPdf(result.Value, query, header),
-                "application/pdf", "LeavesReport.pdf");
-        }
-
-        [HttpGet("leaves/export/excel")]
-        public async Task<IActionResult> ExportLeavesExcel(
-            [FromQuery] string? status, [FromQuery] string? leaveType,
-            [FromQuery] DateOnly? fromDate, [FromQuery] DateOnly? toDate,
-            [FromQuery] int? staffId,
-            CancellationToken ct)
-        {
-            var query = new LeaveReportQueryDto(status, leaveType, fromDate, toDate, staffId);
-            var result = await _leaveService.GetReportDataAsync(query, ct);
-            if (result.IsFailure) return StatusCode(500, ApiResponse.Failure(result.Error.Message));
-            var header = await BuildHeaderAsync(ct);
-            return File(_leaveExportService.ExportExcel(result.Value, query, header),
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "LeavesReport.xlsx");
-        }
-
-        [HttpGet("leaves/export/word")]
-        public async Task<IActionResult> ExportLeavesWord(
-            [FromQuery] string? status, [FromQuery] string? leaveType,
-            [FromQuery] DateOnly? fromDate, [FromQuery] DateOnly? toDate,
-            [FromQuery] int? staffId,
-            CancellationToken ct)
-        {
-            var query = new LeaveReportQueryDto(status, leaveType, fromDate, toDate, staffId);
-            var result = await _leaveService.GetReportDataAsync(query, ct);
-            if (result.IsFailure) return StatusCode(500, ApiResponse.Failure(result.Error.Message));
-            var header = await BuildHeaderAsync(ct);
-            return File(_leaveExportService.ExportWord(result.Value, query, header),
-                "application/msword", "LeavesReport.doc");
-        }
-
+         
         // ── Helpers ───────────────────────────────────────────────────────────
 
         private async Task<SchoolHeaderDto?> BuildHeaderAsync(CancellationToken ct)

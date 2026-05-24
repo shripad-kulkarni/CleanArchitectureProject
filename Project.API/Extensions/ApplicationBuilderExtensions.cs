@@ -1,4 +1,6 @@
-﻿namespace Project.API.Extensions
+﻿using Project.Infrastructure.DbInitializers;
+
+namespace Project.API.Extensions
 {
     public static class ApplicationBuilderExtensions
     {

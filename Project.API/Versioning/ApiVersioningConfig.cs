@@ -1,4 +1,6 @@
-﻿namespace Project.API.Versioning
+﻿using Asp.Versioning;
+
+namespace Project.API.Versioning
 {
     public static class ApiVersioningConfig
     {
