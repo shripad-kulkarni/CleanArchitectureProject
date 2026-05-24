@@ -1,9 +1,14 @@
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Project.Application.Abstractions.Services;
 using Project.Application.DTOs.Settings;
 using Project.Domain.Aggregates.SchoolSettingAggregate;
 using Project.Infrastructure.Persistence;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Project.Infrastructure.Services
 {
@@ -66,3 +71,4 @@ namespace Project.Infrastructure.Services
             new(s.SchoolName, s.LogoPath, s.Address, s.PhoneNumber, s.Email);
     }
 }
+

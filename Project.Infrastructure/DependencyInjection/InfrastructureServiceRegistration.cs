@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -8,24 +7,15 @@ using Microsoft.IdentityModel.Tokens;
 using Project.Application.Abstractions.ExternalServices;
 using Project.Application.Abstractions.Identity;
 using Project.Application.Abstractions.Persistence;
-using Project.Application.Abstractions.Services;
-using Project.Infrastructure.Repositories; 
-using Project.Application.DTOs.Student;
-using Project.Application.Services; 
-using Project.Application.Validators.Student;
+using Project.Infrastructure.Repositories;
 using Project.Infrastructure.DbInitializers;
 using Project.Infrastructure.Identity;
 using Project.Infrastructure.Interceptors;
 using Project.Infrastructure.Options;
 using Project.Infrastructure.Persistence;
-using Project.Infrastructure.Repositories;
 using QuestPDF.Infrastructure;
 using Project.Infrastructure.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Project.Infrastructure.DependencyInjection
 {
@@ -112,14 +102,7 @@ namespace Project.Infrastructure.DependencyInjection
             services.AddSingleton<IStudentExportService, StudentExportService>(); 
             services.AddScoped<IDbInitializer, DbInitializer>();
 
-            // Validators
-            services.AddScoped<IValidator<CreateStudentDto>, CreateStudentValidator>(); 
-
-            // Application services
-            services.AddScoped<IStudentService, StudentService>(); 
             services.AddScoped<IMenuSettingRepository, MenuSettingRepository>();
-            services.AddScoped<IMenuSettingService, MenuSettingService>();
-            services.AddScoped<ISchoolSettingsService, SchoolSettingsService>();
 
             return services;
         }
