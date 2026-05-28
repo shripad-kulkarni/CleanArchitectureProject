@@ -4,7 +4,7 @@ using Project.Domain.Aggregates.MenuSettingAggregate;
 using Project.Domain.Aggregates.SchoolSettingAggregate;
 using Project.Domain.Aggregates.StudentAggregate;
 using Project.Infrastructure.Identity;
-using Project.Infrastructure.Interceptors;
+using Project.Infrastructure.Persistence.Interceptors;
 
 namespace Project.Infrastructure.Persistence
 {

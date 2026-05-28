@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Project.Application.Specifications;
 using Project.Domain.Primitives;
 
-namespace Project.Infrastructure.SpecificationEvaluator
+namespace Project.Infrastructure.Persistence
 {
     public static class SpecificationEvaluator<T> where T : AggregateRoot
     {

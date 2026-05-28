@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project.Infrastructure.Interceptors
+namespace Project.Infrastructure.Persistence.Interceptors
 {
     public sealed class AuditInterceptor : SaveChangesInterceptor
     {

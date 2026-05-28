@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using Project.Application.Abstractions.ExternalServices;
+using Project.Application.Abstractions.Identity;
 using Project.Infrastructure.Options;
 using System;
 using System.Collections.Generic;

@@ -3,7 +3,7 @@ using Project.Domain.Aggregates.MenuSettingAggregate;
 using Project.Domain.Constants;
 using Project.Infrastructure.Persistence;
 
-namespace Project.Infrastructure.Seeding
+namespace Project.Infrastructure.Persistence.Seeding
 {
     public static class MenuSettingSeeder
     {

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project.Infrastructure.Seeding
+namespace Project.Infrastructure.Persistence.Seeding
 {
     public static class AdminSeeder
     {

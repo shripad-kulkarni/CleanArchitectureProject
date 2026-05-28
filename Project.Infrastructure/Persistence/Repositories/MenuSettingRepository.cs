@@ -3,7 +3,7 @@ using Project.Application.Abstractions.Persistence;
 using Project.Domain.Aggregates.MenuSettingAggregate;
 using Project.Infrastructure.Persistence;
 
-namespace Project.Infrastructure.Repositories
+namespace Project.Infrastructure.Persistence.Repositories
 {
     public sealed class MenuSettingRepository : IMenuSettingRepository
     {

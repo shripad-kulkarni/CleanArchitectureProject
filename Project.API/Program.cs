@@ -1,8 +1,8 @@
 using Project.API.Extensions;
 using Project.API.Logging;
-using Project.Infrastructure.DependencyInjection;
 using Project.API.DependencyInjection;
 using Project.Application.DependencyInjection;
+using Project.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 

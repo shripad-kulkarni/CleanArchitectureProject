@@ -3,10 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Project.Application.Abstractions.Persistence;
 using Project.Application.Specifications;
 using Project.Domain.Primitives;
-using Project.Infrastructure.Persistence;
-using Project.Infrastructure.SpecificationEvaluator;
 
-namespace Project.Infrastructure.Repositories
+namespace Project.Infrastructure.Persistence.Repositories
 {
     public class GenericRepository<T> : IRepository<T> where T : AggregateRoot
     {

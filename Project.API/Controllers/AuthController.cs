@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Project.API.CustomResults;
 using Project.Domain.Constants;
-using Project.Infrastructure.Identity;
+using Project.Application.Abstractions.Identity;
 
 namespace Project.API.Controllers
 {

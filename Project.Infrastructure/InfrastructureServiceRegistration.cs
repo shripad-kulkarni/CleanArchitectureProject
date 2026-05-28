@@ -7,17 +7,16 @@ using Microsoft.IdentityModel.Tokens;
 using Project.Application.Abstractions.ExternalServices;
 using Project.Application.Abstractions.Identity;
 using Project.Application.Abstractions.Persistence;
-using Project.Infrastructure.Repositories;
-using Project.Infrastructure.DbInitializers;
 using Project.Infrastructure.Identity;
-using Project.Infrastructure.Interceptors;
 using Project.Infrastructure.Options;
 using Project.Infrastructure.Persistence;
 using QuestPDF.Infrastructure;
 using Project.Infrastructure.Services;
 using System.Text;
+using Project.Infrastructure.Persistence.Repositories;
+using Project.Infrastructure.Persistence.Interceptors;
 
-namespace Project.Infrastructure.DependencyInjection
+namespace Project.Infrastructure
 {
     public static class InfrastructureServiceRegistration
     {
@@ -86,7 +85,7 @@ namespace Project.Infrastructure.DependencyInjection
 
             // Generic Repository & UnitOfWork
             services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
-            services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             // Identity Services
             services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
@@ -100,8 +99,7 @@ namespace Project.Infrastructure.DependencyInjection
             services.AddScoped<IEmailService, EmailService>();
             services.AddSingleton<IPdfGeneratorService, QuestPdfGeneratorService>();
             services.AddSingleton<IStudentExportService, StudentExportService>(); 
-            services.AddScoped<IDbInitializer, DbInitializer>();
-
+ 
             services.AddScoped<IMenuSettingRepository, MenuSettingRepository>();
 
             return services;

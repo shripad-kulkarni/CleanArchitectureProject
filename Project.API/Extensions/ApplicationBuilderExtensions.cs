@@ -1,4 +1,6 @@
-﻿using Project.Infrastructure.DbInitializers;
+﻿using Microsoft.AspNetCore.Identity;
+using Project.Infrastructure.Identity;
+using Project.Infrastructure.Persistence;
 
 namespace Project.API.Extensions
 {
@@ -8,8 +10,10 @@ namespace Project.API.Extensions
             this IApplicationBuilder app)
         {
             using var scope = app.ApplicationServices.CreateScope();
-            var initializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
-            await initializer.InitializeAsync();
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            await DbInitializer.InitializeAsync(db, roleManager, userManager);
             return app;
         }
 
