@@ -1,4 +1,4 @@
-using Project.Domain.Aggregates.MenuSettingAggregate;
+using Project.Domain.Entities;
 
 namespace Project.Application.Abstractions.Persistence
 {

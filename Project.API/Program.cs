@@ -30,5 +30,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseExceptionHandler();
 app.MapControllers();
+app.MapNotificationHub();
 
 app.Run();

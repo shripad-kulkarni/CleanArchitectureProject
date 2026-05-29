@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Project.Domain.Aggregates.MenuSettingAggregate;
+using Project.Domain.Entities;
 
 namespace Project.Infrastructure.Persistence.Configurations
 {

@@ -1,103 +1,82 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Project.API.Controllers.Base;
 using Project.API.CustomResults;
 using Project.Application.Abstractions.ExternalServices;
 using Project.Application.Abstractions.Services;
-using Project.Application.Common.Errors; 
 using Project.Application.DTOs.Report;
 using Project.Application.DTOs.Settings;
 
 namespace Project.API.Controllers
 {
-    [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/reports")]
     [Authorize]
-    public sealed class ReportsController : ControllerBase
+    public sealed class ReportsController : ApiControllerBase
     {
-        private readonly IStudentService _studentService;
-        private readonly IStudentExportService _studentExportService; 
-        private readonly ISchoolSettingsService _settingsService;
-        private readonly IWebHostEnvironment _env;
+        private readonly IUserService _userService;
+        private readonly IUserExportService _userExportService;
+        private readonly IInfoSettingsService _settingsService;
 
         public ReportsController(
-            IStudentService studentService,
-            IStudentExportService studentExportService, 
-            ISchoolSettingsService settingsService,
-            IWebHostEnvironment env)
+            IUserService userService,
+            IUserExportService userExportService,
+            IInfoSettingsService settingsService)
         {
-            _studentService = studentService;
-            _studentExportService = studentExportService; 
+            _userService = userService;
+            _userExportService = userExportService;
             _settingsService = settingsService;
-            _env = env;
         }
 
-        // ── Students ─────────────────────────────────────────────────────────
-
-        [HttpGet("students")]
-        public async Task<IActionResult> GetStudents(
-            [FromQuery] string? className, [FromQuery] string? academicYear, CancellationToken ct)
+        [HttpGet("users")]
+        public async Task<IActionResult> GetUsers(
+            [FromQuery] string? searchTerm, [FromQuery] string? gender, CancellationToken ct)
         {
-            var result = await _studentService.GetReportDataAsync(
-                new StudentReportQueryDto(className, academicYear), ct);
+            var result = await _userService.GetReportDataAsync(new UserReportQueryDto(searchTerm, gender), ct);
             if (result.IsFailure) return StatusCode(500, ApiResponse.Failure(result.Error.Message));
-            return Ok(ApiResponse<IReadOnlyList<StudentReportRowDto>>.Success(result.Value));
+            return Ok(ApiResponse<IReadOnlyList<UserReportRowDto>>.Success(result.Value));
         }
 
-        [HttpGet("students/export/pdf")]
-        public async Task<IActionResult> ExportStudentsPdf(
-            [FromQuery] string? className, [FromQuery] string? academicYear, CancellationToken ct)
+        [HttpGet("users/export/pdf")]
+        public async Task<IActionResult> ExportUsersPdf(
+            [FromQuery] string? searchTerm, [FromQuery] string? gender, CancellationToken ct)
         {
-            var result = await _studentService.GetReportDataAsync(
-                new StudentReportQueryDto(className, academicYear), ct);
+            var result = await _userService.GetReportDataAsync(new UserReportQueryDto(searchTerm, gender), ct);
             if (result.IsFailure) return StatusCode(500, ApiResponse.Failure(result.Error.Message));
             var header = await BuildHeaderAsync(ct);
-            return File(_studentExportService.ExportPdf(result.Value, className, academicYear, header),
-                "application/pdf", "StudentsReport.pdf");
+            return File(_userExportService.ExportPdf(result.Value, BuildFilterLabel(searchTerm, gender), header),
+                "application/pdf", "UsersReport.pdf");
         }
 
-        [HttpGet("students/export/excel")]
-        public async Task<IActionResult> ExportStudentsExcel(
-            [FromQuery] string? className, [FromQuery] string? academicYear, CancellationToken ct)
+        [HttpGet("users/export/excel")]
+        public async Task<IActionResult> ExportUsersExcel(
+            [FromQuery] string? searchTerm, [FromQuery] string? gender, CancellationToken ct)
         {
-            var result = await _studentService.GetReportDataAsync(
-                new StudentReportQueryDto(className, academicYear), ct);
+            var result = await _userService.GetReportDataAsync(new UserReportQueryDto(searchTerm, gender), ct);
             if (result.IsFailure) return StatusCode(500, ApiResponse.Failure(result.Error.Message));
             var header = await BuildHeaderAsync(ct);
-            return File(_studentExportService.ExportExcel(result.Value, className, academicYear, header),
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "StudentsReport.xlsx");
+            return File(_userExportService.ExportExcel(result.Value, BuildFilterLabel(searchTerm, gender), header),
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "UsersReport.xlsx");
         }
 
-        [HttpGet("students/export/word")]
-        public async Task<IActionResult> ExportStudentsWord(
-            [FromQuery] string? className, [FromQuery] string? academicYear, CancellationToken ct)
+        [HttpGet("users/export/word")]
+        public async Task<IActionResult> ExportUsersWord(
+            [FromQuery] string? searchTerm, [FromQuery] string? gender, CancellationToken ct)
         {
-            var result = await _studentService.GetReportDataAsync(
-                new StudentReportQueryDto(className, academicYear), ct);
+            var result = await _userService.GetReportDataAsync(new UserReportQueryDto(searchTerm, gender), ct);
             if (result.IsFailure) return StatusCode(500, ApiResponse.Failure(result.Error.Message));
             var header = await BuildHeaderAsync(ct);
-            return File(_studentExportService.ExportWord(result.Value, className, academicYear, header),
-                "application/msword", "StudentsReport.doc");
+            return File(_userExportService.ExportWord(result.Value, BuildFilterLabel(searchTerm, gender), header),
+                "application/msword", "UsersReport.doc");
         }
 
-         
-        // ── Helpers ───────────────────────────────────────────────────────────
-
-        private async Task<SchoolHeaderDto?> BuildHeaderAsync(CancellationToken ct)
+        private async Task<InfoHeaderDto?> BuildHeaderAsync(CancellationToken ct)
         {
             try
             {
                 var settings = await _settingsService.GetAsync(ct);
-                byte[]? logoBytes = null;
-                if (!string.IsNullOrWhiteSpace(settings.LogoPath))
-                {
-                    var physicalPath = Path.Combine(_env.ContentRootPath, "wwwroot",
-                        settings.LogoPath.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
-                    if (System.IO.File.Exists(physicalPath))
-                        logoBytes = await System.IO.File.ReadAllBytesAsync(physicalPath, ct);
-                }
-                return new SchoolHeaderDto(settings.SchoolName, settings.Address, settings.PhoneNumber, logoBytes);
+                return new InfoHeaderDto(settings.SchoolName, settings.Address, settings.PhoneNumber, null);
             }
             catch
             {
@@ -105,10 +84,12 @@ namespace Project.API.Controllers
             }
         }
 
-        private IActionResult ToErrorResponse(Error error) => error.Type switch
+        private static string? BuildFilterLabel(string? searchTerm, string? gender)
         {
-            ErrorType.NotFound => NotFound(ApiResponse.Failure(error.Message)),
-            _ => StatusCode(500, ApiResponse.Failure(error.Message))
-        };
+            var parts = new List<string>();
+            if (!string.IsNullOrWhiteSpace(searchTerm)) parts.Add($"Search: {searchTerm}");
+            if (!string.IsNullOrWhiteSpace(gender)) parts.Add($"Gender: {gender}");
+            return parts.Count > 0 ? string.Join("   |   ", parts) : null;
+        }
     }
 }

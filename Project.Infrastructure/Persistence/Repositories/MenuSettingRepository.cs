@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Project.Application.Abstractions.Persistence;
-using Project.Domain.Aggregates.MenuSettingAggregate;
+using Project.Domain.Entities;
 using Project.Infrastructure.Persistence;
 
 namespace Project.Infrastructure.Persistence.Repositories

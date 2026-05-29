@@ -1,11 +1,13 @@
 ﻿using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Project.Application.Abstractions.Identity;
 using Project.Application.Abstractions.Persistence;
+using Project.Application.Abstractions.ExternalServices;
 using Project.Application.Abstractions.Services;
-using Project.Application.DTOs.Student;
+using Project.Application.DTOs.User;
 using Project.Application.Services;
-using Project.Application.Validators.Student;
+using Project.Application.Validators.User;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,13 +24,13 @@ namespace Project.Application.DependencyInjection
         {
 
             // Validators
-            services.AddScoped<IValidator<CreateStudentDto>, CreateStudentValidator>();
+            services.AddScoped<IValidator<CreateUserDto>, CreateUserValidator>();
 
-            // Application services
-
-            
-            services.AddScoped<IStudentService, StudentService>();
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IInfoSettingsService, InfoSettingsService>();
+            services.AddScoped<IUserService, UserService>();
             services.AddScoped<IMenuSettingService, MenuSettingService>();
+            services.AddScoped<IPaymentService, PaymentService>();
  
             return services;
         }

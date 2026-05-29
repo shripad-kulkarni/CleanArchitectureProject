@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Project.Application.Abstractions.Identity;
+using Project.Domain.Aggregates;
 using Project.Infrastructure.Options;
 using System;
 using System.Collections.Generic;

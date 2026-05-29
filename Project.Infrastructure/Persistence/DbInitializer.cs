@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Project.Domain.Aggregates;
 using Project.Infrastructure.Identity;
 using Project.Infrastructure.Persistence.Seeding;
 

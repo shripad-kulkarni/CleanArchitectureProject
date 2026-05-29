@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using Project.Domain.Aggregates.MenuSettingAggregate;
 using Project.Domain.Constants;
+using Project.Domain.Entities;
 using Project.Infrastructure.Persistence;
 
 namespace Project.Infrastructure.Persistence.Seeding

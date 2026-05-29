@@ -1,11 +1,9 @@
-using Project.Application.DTOs.Student;
+using Project.Application.DTOs.User;
 
 namespace Project.Application.Abstractions.ExternalServices
 {
     public interface IPdfGeneratorService
     {
-        byte[] GenerateBonafideCertificate(StudentDto student);
-        byte[] GenerateLeavingCertificate(StudentDto student);
-        byte[] GenerateStudentProfileReport(StudentDto student);
+        byte[] GenerateUserProfileReport(UserDto user);
     }
 }

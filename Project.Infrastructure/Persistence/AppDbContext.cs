@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Project.Domain.Aggregates.MenuSettingAggregate;
-using Project.Domain.Aggregates.SchoolSettingAggregate;
-using Project.Domain.Aggregates.StudentAggregate;
+using Project.Domain.Aggregates;
+using Project.Domain.Aggregates.PaymentAggregate;
+using Project.Domain.Aggregates.UserAggregate;
+using Project.Domain.Entities;
 using Project.Infrastructure.Identity;
 using Project.Infrastructure.Persistence.Interceptors;
 
@@ -23,11 +24,12 @@ namespace Project.Infrastructure.Persistence
             _softDeleteInterceptor = softDeleteInterceptor;
         }
 
-        public DbSet<Student> Students => Set<Student>();
-        public DbSet<StudentDocument> StudentDocuments => Set<StudentDocument>();
-         
+        public DbSet<User> DomainUsers => Set<User>();
+        public DbSet<UserDocument> UserDocuments => Set<UserDocument>();
+
         public DbSet<MenuSetting> MenuSettings => Set<MenuSetting>();
-        public DbSet<SchoolSettings> SchoolSettings => Set<SchoolSettings>();
+        public DbSet<InfoSetting> InfoSettings => Set<InfoSetting>();
+        public DbSet<Payment> Payments => Set<Payment>();
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -37,8 +39,6 @@ namespace Project.Infrastructure.Persistence
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            // Auto-apply all IEntityTypeConfiguration<T> from this assembly
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
         }
     }

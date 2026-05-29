@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Project.Domain.Aggregates;
 using Project.Infrastructure.Identity;
 using System;
 using System.Collections.Generic;

@@ -23,8 +23,8 @@ namespace Project.API.Handlers
 
             var (statusCode, title) = exception switch
             {
-                StudentNotFoundException  => (HttpStatusCode.NotFound, "Resource Not Found"), 
-                DomainException => (HttpStatusCode.BadRequest, "Domain Error"),
+                UserNotFoundException => (HttpStatusCode.NotFound, "Resource Not Found"),
+                DomainException       => (HttpStatusCode.BadRequest, "Domain Error"),
                 UnauthorizedAccessException => (HttpStatusCode.Unauthorized, "Unauthorized"),
                 _ => (HttpStatusCode.InternalServerError, "Server Error")
             };

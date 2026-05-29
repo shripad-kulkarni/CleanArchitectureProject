@@ -4,10 +4,17 @@
       "Bash(Get-ChildItem -Recurse -Depth 3 \"e:\\\\CrsJourney\\\\API\\\\CleanArchitectureProject\")",
       "Bash(Select-Object FullName, PSIsContainer)",
       "Bash(Format-Table -AutoSize)",
-      "PowerShell(Get-ChildItem -Recurse -Depth 4 \"e:\\\\CrsJourney\\\\API\\\\CleanArchitectureProject\" | Where-Object { $_.PSIsContainer -or $_.Extension -in @\\('.cs', '.csproj', '.sln'\\) } | Select-Object FullName | Format-Table -AutoSize -Wrap)"
+      "PowerShell(Get-ChildItem -Recurse -Depth 4 \"e:\\\\CrsJourney\\\\API\\\\CleanArchitectureProject\" | Where-Object { $_.PSIsContainer -or $_.Extension -in @\\('.cs', '.csproj', '.sln'\\) } | Select-Object FullName | Format-Table -AutoSize -Wrap)",
+      "Bash(dotnet build *)",
+      "Bash(Remove-Item \"e:\\\\CrsJourney\\\\API\\\\CleanArchitectureProject\\\\Project.Application\\\\Abstractions\\\\Persistence\\\\IInfoSettingRepository.cs\" -Force)",
+      "Bash(Remove-Item \"e:\\\\CrsJourney\\\\API\\\\CleanArchitectureProject\\\\Project.Infrastructure\\\\Persistence\\\\Repositories\\\\InfoSettingRepository.cs\" -Force)",
+      "Bash(Get-ChildItem -Recurse -Name)",
+      "Bash(Select-Object -First 50)",
+      "Bash(dotnet add *)"
     ],
     "additionalDirectories": [
-      "e:\\CrsJourney\\API\\CleanArchitectureProject\\Project.Infrastructure\\DbInitializers"
+      "e:\\CrsJourney\\API\\CleanArchitectureProject\\Project.Infrastructure\\DbInitializers",
+      "e:\\CrsJourney\\API\\CleanArchitectureProject\\Project.Application\\Abstractions\\Services"
     ]
   }
 }

@@ -3,8 +3,8 @@ using Project.Application.Abstractions.Services;
 using Project.Application.Common.Errors;
 using Project.Application.Common.Result;
 using Project.Application.DTOs.MenuSetting;
-using Project.Domain.Aggregates.MenuSettingAggregate;
 using Project.Domain.Constants;
+using Project.Domain.Entities;
 
 namespace Project.Application.Services
 {

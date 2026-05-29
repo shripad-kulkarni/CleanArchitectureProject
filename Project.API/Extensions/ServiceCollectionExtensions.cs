@@ -16,7 +16,8 @@
                 {
                     policy.WithOrigins(allowedOrigins)
                           .AllowAnyHeader()
-                          .AllowAnyMethod();
+                          .AllowAnyMethod()
+                          .AllowCredentials();  // required for SignalR WebSocket handshake
                 });
 
                 options.AddPolicy("AllowAll", policy =>

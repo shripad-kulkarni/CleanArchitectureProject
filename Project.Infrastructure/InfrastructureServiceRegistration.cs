@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using Project.Application.Abstractions.ExternalServices;
 using Project.Application.Abstractions.Identity;
 using Project.Application.Abstractions.Persistence;
+using Project.Infrastructure.Hubs;
 using Project.Infrastructure.Identity;
 using Project.Infrastructure.Options;
 using Project.Infrastructure.Persistence;
@@ -15,6 +16,7 @@ using Project.Infrastructure.Services;
 using System.Text;
 using Project.Infrastructure.Persistence.Repositories;
 using Project.Infrastructure.Persistence.Interceptors;
+using Project.Domain.Aggregates;
 
 namespace Project.Infrastructure
 {
@@ -31,6 +33,7 @@ namespace Project.Infrastructure
             services.Configure<EmailOptions>(configuration.GetSection(EmailOptions.SectionName));
             services.Configure<FileStorageOptions>(configuration.GetSection(FileStorageOptions.SectionName));
             services.Configure<FrontendOptions>(configuration.GetSection(FrontendOptions.SectionName));
+            services.Configure<RazorpayOptions>(configuration.GetSection(RazorpayOptions.SectionName));
 
             // Interceptors
             services.AddScoped<AuditInterceptor>();
@@ -81,26 +84,44 @@ namespace Project.Infrastructure
                     IssuerSigningKey = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(jwtOptions.SecretKey))
                 };
+
+                // SignalR sends the JWT via query string instead of Authorization header
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var token = context.Request.Query["access_token"];
+                        if (!string.IsNullOrEmpty(token) &&
+                            context.HttpContext.Request.Path.StartsWithSegments("/hubs"))
+                            context.Token = token;
+                        return Task.CompletedTask;
+                    }
+                };
             });
+
+            // SignalR
+            services.AddSignalR();
+            services.AddSingleton<INotificationService, NotificationService>();
 
             // Generic Repository & UnitOfWork
             services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             // Identity Services
-            services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
-            services.AddScoped<IAuthService, AuthService>();
+            
             services.AddHttpContextAccessor();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
+            services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
             // External Services
             services.AddScoped<IDateTimeProvider, IndianDateTimeProvider>();
             services.AddScoped<IFileStorageService, LocalFileStorageService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddSingleton<IPdfGeneratorService, QuestPdfGeneratorService>();
-            services.AddSingleton<IStudentExportService, StudentExportService>(); 
+            services.AddSingleton<IUserExportService, UserExportService>();
  
             services.AddScoped<IMenuSettingRepository, MenuSettingRepository>();
+            services.AddScoped<IPaymentGatewayService, RazorpayService>();
 
             return services;
         }
