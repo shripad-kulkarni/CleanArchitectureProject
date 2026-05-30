@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Project.API.CustomResults;
 using Project.Application.Abstractions.Services;
 using Project.Application.DTOs.Settings;
+using Project.Domain.Constants;
 
 namespace Project.API.Controllers
 {
@@ -28,7 +29,7 @@ namespace Project.API.Controllers
         }
 
         [HttpPut]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = RoleConstants.Admin)]
         public async Task<IActionResult> Update([FromBody] UpdateInfoSettingsDto dto, CancellationToken ct)
         {
             await _service.UpdateAsync(dto, ct);
@@ -36,7 +37,7 @@ namespace Project.API.Controllers
         }
 
         [HttpPost("logo")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = RoleConstants.Admin)]
         public async Task<IActionResult> UploadLogo(IFormFile? file, CancellationToken ct)
         {
             if (file is null || file.Length == 0)

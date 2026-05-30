@@ -117,7 +117,7 @@ namespace Project.Application.Services
 
             var body = $"""
                 <div style="font-family:sans-serif;max-width:480px;margin:auto">
-                  <h2 style="color:#2196F3">Welcome to EduManage</h2>
+                  <h2 style="color:#2196F3">Welcome</h2>
                   <p>Hello {firstName},</p>
                   <p>Your account has been created as <strong>{role}</strong>. Click the button below to set your password and activate your account.</p>
                   <p style="margin:24px 0">
@@ -127,7 +127,7 @@ namespace Project.Application.Services
                 </div>
                 """;
 
-            await _emailService.SendAsync(email, "Welcome to EduManage – Set Your Password", body, ct);
+            await _emailService.SendAsync(email, "Welcome – Set Your Password", body, ct);
 
             return new AuthResult(true, null, null);
         }

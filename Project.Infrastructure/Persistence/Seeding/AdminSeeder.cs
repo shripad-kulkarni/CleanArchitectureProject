@@ -1,11 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Project.Domain.Aggregates;
+using Project.Domain.Constants;
 using Project.Infrastructure.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Project.Infrastructure.Persistence.Seeding
 {
@@ -13,8 +9,8 @@ namespace Project.Infrastructure.Persistence.Seeding
     {
         public static async Task SeedAsync(UserManager<ApplicationUser> userManager)
         {
-            const string adminEmail = "admin@school.com";
-            const string adminPassword = "Admin@123456";
+            const string adminEmail = "admin@gmail.com";
+            const string adminPassword = "Admin@123";
 
             var existing = await userManager.FindByEmailAsync(adminEmail);
             if (existing is not null) return;
@@ -30,7 +26,7 @@ namespace Project.Infrastructure.Persistence.Seeding
             };
 
             await userManager.CreateAsync(admin, adminPassword);
-            await userManager.AddToRoleAsync(admin, "Admin");
+            await userManager.AddToRoleAsync(admin, RoleConstants.Admin);
         }
     }
 }

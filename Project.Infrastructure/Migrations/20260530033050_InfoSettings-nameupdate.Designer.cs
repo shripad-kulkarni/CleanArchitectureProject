@@ -11,8 +11,8 @@ using Project.Infrastructure.Persistence;
 namespace Project.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260529013055_Initial")]
-    partial class Initial
+    [Migration("20260530033050_InfoSettings-nameupdate")]
+    partial class InfoSettingsnameupdate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -223,92 +223,78 @@ namespace Project.Infrastructure.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("Project.Domain.Aggregates.MenuSettingAggregate.MenuSetting", b =>
+            modelBuilder.Entity("Project.Domain.Aggregates.PaymentAggregate.Payment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsVisible")
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("varchar(10)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("DeletedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("GatewayOrderId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("GatewayPaymentId")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<string>("MenuKey")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
 
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                    b.Property<string>("Receipt")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MenuKey", "Role")
+                    b.HasIndex("GatewayOrderId")
                         .IsUnique();
 
-                    b.ToTable("MenuSettings", (string)null);
+                    b.ToTable("Payments", (string)null);
                 });
 
-            modelBuilder.Entity("Project.Domain.Aggregates.SchoolSettingAggregate.SchoolSettings", b =>
+            modelBuilder.Entity("Project.Domain.Aggregates.UserAggregate.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    b.Property<string>("Address")
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(150)
-                        .HasColumnType("varchar(150)");
-
-                    b.Property<string>("LogoPath")
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasMaxLength(30)
-                        .HasColumnType("varchar(30)");
-
-                    b.Property<string>("SchoolName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("SchoolSettings", (string)null);
-                });
-
-            modelBuilder.Entity("Project.Domain.Aggregates.StudentAggregate.Student", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<string>("AcademicYear")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)");
-
-                    b.Property<DateOnly>("AdmissionDate")
-                        .HasColumnType("date");
-
-                    b.Property<string>("AdmissionNumber")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
 
                     b.Property<string>("BloodGroup")
                         .HasMaxLength(10)
                         .HasColumnType("varchar(10)");
-
-                    b.Property<string>("ClassName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
@@ -345,23 +331,6 @@ namespace Project.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
-                    b.Property<string>("ParentEmail")
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
-                    b.Property<string>("ParentName")
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
-                    b.Property<string>("ParentPhone")
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)");
-
-                    b.Property<string>("RollNumber")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
-
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
@@ -370,13 +339,10 @@ namespace Project.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AdmissionNumber")
-                        .IsUnique();
-
-                    b.ToTable("Students", (string)null);
+                    b.ToTable("Users", (string)null);
                 });
 
-            modelBuilder.Entity("Project.Domain.Aggregates.StudentAggregate.StudentDocument", b =>
+            modelBuilder.Entity("Project.Domain.Aggregates.UserAggregate.UserDocument", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -413,8 +379,63 @@ namespace Project.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<int>("StudentId")
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("UpdatedBy")
                         .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserDocuments", (string)null);
+                });
+
+            modelBuilder.Entity("Project.Domain.Entities.InfoSetting", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Address")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("DeletedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(150)
+                        .HasColumnType("varchar(150)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("LogoPath")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)");
@@ -424,9 +445,55 @@ namespace Project.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StudentId");
+                    b.ToTable("InfoSettings", (string)null);
+                });
 
-                    b.ToTable("StudentDocuments", (string)null);
+            modelBuilder.Entity("Project.Domain.Entities.MenuSetting", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("DeletedBy")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsVisible")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("MenuKey")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MenuKey", "Role")
+                        .IsUnique();
+
+                    b.ToTable("MenuSettings", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -480,11 +547,11 @@ namespace Project.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Project.Domain.Aggregates.StudentAggregate.Student", b =>
+            modelBuilder.Entity("Project.Domain.Aggregates.UserAggregate.User", b =>
                 {
                     b.OwnsOne("Project.Domain.ValueObjects.Address", "Address", b1 =>
                         {
-                            b1.Property<int>("StudentId")
+                            b1.Property<int>("UserId")
                                 .HasColumnType("int");
 
                             b1.Property<string>("City")
@@ -517,17 +584,17 @@ namespace Project.Infrastructure.Migrations
                                 .HasColumnType("varchar(200)")
                                 .HasColumnName("Street");
 
-                            b1.HasKey("StudentId");
+                            b1.HasKey("UserId");
 
-                            b1.ToTable("Students");
+                            b1.ToTable("Users");
 
                             b1.WithOwner()
-                                .HasForeignKey("StudentId");
+                                .HasForeignKey("UserId");
                         });
 
                     b.OwnsOne("Project.Domain.ValueObjects.Email", "Email", b1 =>
                         {
-                            b1.Property<int>("StudentId")
+                            b1.Property<int>("UserId")
                                 .HasColumnType("int");
 
                             b1.Property<string>("Value")
@@ -536,17 +603,20 @@ namespace Project.Infrastructure.Migrations
                                 .HasColumnType("varchar(200)")
                                 .HasColumnName("Email");
 
-                            b1.HasKey("StudentId");
+                            b1.HasKey("UserId");
 
-                            b1.ToTable("Students");
+                            b1.HasIndex("Value")
+                                .IsUnique();
+
+                            b1.ToTable("Users");
 
                             b1.WithOwner()
-                                .HasForeignKey("StudentId");
+                                .HasForeignKey("UserId");
                         });
 
                     b.OwnsOne("Project.Domain.ValueObjects.PhoneNumber", "Phone", b1 =>
                         {
-                            b1.Property<int>("StudentId")
+                            b1.Property<int>("UserId")
                                 .HasColumnType("int");
 
                             b1.Property<string>("Value")
@@ -555,12 +625,12 @@ namespace Project.Infrastructure.Migrations
                                 .HasColumnType("varchar(20)")
                                 .HasColumnName("Phone");
 
-                            b1.HasKey("StudentId");
+                            b1.HasKey("UserId");
 
-                            b1.ToTable("Students");
+                            b1.ToTable("Users");
 
                             b1.WithOwner()
-                                .HasForeignKey("StudentId");
+                                .HasForeignKey("UserId");
                         });
 
                     b.Navigation("Address")
@@ -573,16 +643,16 @@ namespace Project.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Project.Domain.Aggregates.StudentAggregate.StudentDocument", b =>
+            modelBuilder.Entity("Project.Domain.Aggregates.UserAggregate.UserDocument", b =>
                 {
-                    b.HasOne("Project.Domain.Aggregates.StudentAggregate.Student", null)
+                    b.HasOne("Project.Domain.Aggregates.UserAggregate.User", null)
                         .WithMany("Documents")
-                        .HasForeignKey("StudentId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Project.Domain.Aggregates.StudentAggregate.Student", b =>
+            modelBuilder.Entity("Project.Domain.Aggregates.UserAggregate.User", b =>
                 {
                     b.Navigation("Documents");
                 });

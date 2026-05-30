@@ -10,9 +10,6 @@ namespace Project.Application.Services
 {
     public sealed class MenuSettingService : IMenuSettingService
     {
-        private static readonly string[] AllRoles =
-            [RoleConstants.Admin, RoleConstants.Teacher, RoleConstants.Accountant, RoleConstants.Staff];
-
         private readonly IMenuSettingRepository _repository;
         private readonly IUnitOfWork _unitOfWork;
 
@@ -30,7 +27,7 @@ namespace Project.Application.Services
                 .GroupBy(s => s.MenuKey)
                 .Select(g => new MenuMatrixDto(
                     g.Key,
-                    AllRoles.ToDictionary(r => r, r => g.FirstOrDefault(s => s.Role == r)?.IsVisible ?? false)))
+                    RoleConstants.AllRoles.ToDictionary(r => r, r => g.FirstOrDefault(s => s.Role == r)?.IsVisible ?? false)))
                 .ToList();
 
             return Result<List<MenuMatrixDto>>.Success(grouped);

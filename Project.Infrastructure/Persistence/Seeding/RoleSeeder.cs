@@ -1,9 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Project.Domain.Constants;
 
 namespace Project.Infrastructure.Persistence.Seeding
 {
@@ -11,9 +7,7 @@ namespace Project.Infrastructure.Persistence.Seeding
     {
         public static async Task SeedAsync(RoleManager<IdentityRole> roleManager)
         {
-            string[] roles = ["Admin", "Teacher", "Accountant", "Staff"];
-
-            foreach (var role in roles)
+            foreach (var role in RoleConstants.AllRoles)
             {
                 if (!await roleManager.RoleExistsAsync(role))
                     await roleManager.CreateAsync(new IdentityRole(role));

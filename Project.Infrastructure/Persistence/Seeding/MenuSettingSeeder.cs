@@ -10,21 +10,14 @@ namespace Project.Infrastructure.Persistence.Seeding
         // menuKey → roles that can see it by default
         private static readonly Dictionary<string, string[]> Defaults = new()
         {
-            ["dashboard"]  = [RoleConstants.Admin, RoleConstants.Teacher, RoleConstants.Accountant, RoleConstants.Staff],
-            ["students"]   = [RoleConstants.Admin, RoleConstants.Teacher],
-            ["fees"]       = [RoleConstants.Admin, RoleConstants.Accountant],
-            ["attendance"] = [RoleConstants.Admin, RoleConstants.Teacher, RoleConstants.Staff],
-            ["documents"]  = [RoleConstants.Admin, RoleConstants.Teacher],
-            ["staff"]      = [RoleConstants.Admin],
-            ["leaves"]     = [RoleConstants.Admin, RoleConstants.Teacher, RoleConstants.Staff],
-            ["salaries"]   = [RoleConstants.Admin, RoleConstants.Accountant],
-            ["expenses"]   = [RoleConstants.Admin, RoleConstants.Accountant],
-            ["reports"]    = [RoleConstants.Admin],
-            ["users"]      = [RoleConstants.Admin],
+            ["dashboard"] = [RoleConstants.Admin, RoleConstants.Manager, RoleConstants.User, RoleConstants.Guest],
+            ["records"]   = [RoleConstants.Admin, RoleConstants.Manager],
+            ["finances"]  = [RoleConstants.Admin, RoleConstants.Manager],
+            ["documents"] = [RoleConstants.Admin, RoleConstants.Manager, RoleConstants.User],
+            ["reports"]   = [RoleConstants.Admin, RoleConstants.Manager],
+            ["settings"]  = [RoleConstants.Admin],
+            ["users"]     = [RoleConstants.Admin],
         };
-
-        private static readonly string[] AllRoles =
-            [RoleConstants.Admin, RoleConstants.Teacher, RoleConstants.Accountant, RoleConstants.Staff];
 
         public static async Task SeedAsync(AppDbContext db)
         {
@@ -34,7 +27,7 @@ namespace Project.Infrastructure.Persistence.Seeding
             var settings = new List<MenuSetting>();
             foreach (var (key, visibleRoles) in Defaults)
             {
-                foreach (var role in AllRoles)
+                foreach (var role in RoleConstants.AllRoles)
                 {
                     settings.Add(MenuSetting.Create(key, role, visibleRoles.Contains(role)));
                 }

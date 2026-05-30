@@ -8,7 +8,7 @@ namespace Project.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<InfoSetting> builder)
         {
-            builder.ToTable("SchoolSettings");
+            builder.ToTable("InfoSettings");
             builder.HasKey(x => x.Id);
 
             builder.Property(x => x.Name).IsRequired().HasMaxLength(200);
