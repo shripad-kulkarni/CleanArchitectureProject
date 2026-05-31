@@ -1,0 +1,302 @@
+@model Project.Application.DTOs.User.UserDto
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>User Profile — @Model.FullName</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10pt;
+            color: #1f2937;
+            background: #ffffff;
+        }
+
+        /* ── Header ─────────────────────────────────────── */
+        .header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 60%, #2563eb 100%);
+            color: #ffffff;
+            padding: 28px 32px 24px;
+            position: relative;
+        }
+
+        .header-inner {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+        }
+
+        .header-name {
+            font-size: 20pt;
+            font-weight: bold;
+            letter-spacing: 0.3px;
+        }
+
+        .header-subtitle {
+            font-size: 10pt;
+            opacity: 0.80;
+            margin-top: 4px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .header-meta {
+            font-size: 8pt;
+            opacity: 0.65;
+            margin-top: 10px;
+        }
+
+        .header-id {
+            text-align: right;
+        }
+
+        .header-id .id-label {
+            font-size: 8pt;
+            opacity: 0.65;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .header-id .id-value {
+            font-size: 18pt;
+            font-weight: bold;
+            opacity: 0.30;
+            line-height: 1;
+        }
+
+        .header-bar {
+            height: 4px;
+            background: linear-gradient(to right, #93c5fd, #bfdbfe, #ffffff30);
+            margin-top: 18px;
+        }
+
+        /* ── Body wrapper ────────────────────────────────── */
+        .body {
+            padding: 20px 28px 28px;
+        }
+
+        /* ── Section ─────────────────────────────────────── */
+        .section {
+            margin-bottom: 18px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 0;
+        }
+
+        .section-title-bar {
+            width: 4px;
+            height: 16px;
+            background: #1e40af;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .section-title-text {
+            font-size: 9pt;
+            font-weight: bold;
+            color: #1e40af;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        /* ── Info table ──────────────────────────────────── */
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .info-table td {
+            padding: 8px 12px;
+            font-size: 9.5pt;
+            border: 1px solid #e5e7eb;
+            vertical-align: top;
+        }
+
+        .info-table td.lbl {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #374151;
+            width: 18%;
+            white-space: nowrap;
+        }
+
+        .info-table td.val {
+            color: #111827;
+            width: 32%;
+        }
+
+        /* ── Divider ─────────────────────────────────────── */
+        .divider {
+            border: none;
+            border-top: 1px solid #e5e7eb;
+            margin: 20px 0;
+        }
+
+        /* ── Footer ──────────────────────────────────────── */
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 24px;
+            padding-top: 14px;
+            border-top: 1px solid #d1d5db;
+        }
+
+        .disclaimer {
+            font-size: 7.5pt;
+            color: #9ca3af;
+            font-style: italic;
+            max-width: 65%;
+            line-height: 1.5;
+        }
+
+        .signature {
+            text-align: center;
+        }
+
+        .sig-line {
+            font-size: 9pt;
+            color: #9ca3af;
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+        }
+
+        .sig-label {
+            font-size: 8pt;
+            font-weight: 600;
+            color: #374151;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="header-inner">
+            <div>
+                <div class="header-name">@Model.FullName</div>
+                <div class="header-subtitle">User Profile Report</div>
+                <div class="header-meta">Generated: @DateTime.Today.ToString("dd MMMM yyyy")</div>
+            </div>
+            <div class="header-id">
+                <div class="id-label">User ID</div>
+                <div class="id-value">#@Model.Id</div>
+            </div>
+        </div>
+        <div class="header-bar"></div>
+    </div>
+
+    <div class="body">
+
+        <div class="section">
+            <div class="section-title">
+                <div class="section-title-bar"></div>
+                <div class="section-title-text">Personal Information</div>
+            </div>
+            <table class="info-table">
+                <tr>
+                    <td class="lbl">Full Name</td>
+                    <td class="val">@Model.FullName</td>
+                    <td class="lbl">Gender</td>
+                    <td class="val">@Model.Gender</td>
+                </tr>
+                <tr>
+                    <td class="lbl">Date of Birth</td>
+                    <td class="val">@Model.DateOfBirth.ToString("dd/MM/yyyy")</td>
+                    <td class="lbl">Blood Group</td>
+                    <td class="val">@(string.IsNullOrWhiteSpace(Model.BloodGroup) ? "—" : Model.BloodGroup)</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <div class="section-title-bar"></div>
+                <div class="section-title-text">Contact Information</div>
+            </div>
+            <table class="info-table">
+                <tr>
+                    <td class="lbl">Email</td>
+                    <td class="val">@Model.Email</td>
+                    <td class="lbl">Phone</td>
+                    <td class="val">@Model.Phone</td>
+                </tr>
+                <tr>
+                    <td class="lbl">Street</td>
+                    <td class="val">@Model.Street</td>
+                    <td class="lbl">City</td>
+                    <td class="val">@Model.City</td>
+                </tr>
+                <tr>
+                    <td class="lbl">State</td>
+                    <td class="val">@Model.State</td>
+                    <td class="lbl">Pin Code</td>
+                    <td class="val">@Model.PinCode</td>
+                </tr>
+            </table>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.EmergencyContact))
+        {
+            <div class="section">
+                <div class="section-title">
+                    <div class="section-title-bar"></div>
+                    <div class="section-title-text">Emergency Contact</div>
+                </div>
+                <table class="info-table">
+                    <tr>
+                        <td class="lbl">Contact</td>
+                        <td class="val" colspan="3">@Model.EmergencyContact</td>
+                    </tr>
+                </table>
+            </div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Model.Description))
+        {
+            <div class="section">
+                <div class="section-title">
+                    <div class="section-title-bar"></div>
+                    <div class="section-title-text">Description</div>
+                </div>
+                <table class="info-table">
+                    <tr>
+                        <td class="val" colspan="4" style="line-height:1.6">@Model.Description</td>
+                    </tr>
+                </table>
+            </div>
+        }
+
+        <div class="footer">
+            <div class="disclaimer">
+                This report is system-generated and is valid for official reference purposes only.
+                Any alterations render this document invalid.
+            </div>
+            <div class="signature">
+                <div class="sig-line">_ _ _ _ _ _ _ _ _ _ _ _ _</div>
+                <div class="sig-label">Authorised Signatory</div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

@@ -10,7 +10,7 @@ namespace Project.API.DependencyInjection
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.AddControllers();
+            services.AddControllersWithViews();
             services.AddEndpointsApiExplorer();
 
             services.AddApiVersioningConfig();

@@ -11,7 +11,7 @@ namespace Project.API.Controllers.Base
         {
             ErrorType.NotFound     => NotFound(ApiResponse.Failure(error.Message)),
             ErrorType.Conflict     => Conflict(ApiResponse.Failure(error.Message)),
-            ErrorType.Validation   => BadRequest(ApiResponse.Failure(error.Message)),
+            ErrorType.Validation   => BadRequest(ApiResponse.Failure(error.Message, error.Errors)),
             ErrorType.Unauthorized => Unauthorized(ApiResponse.Failure(error.Message)),
             _                      => StatusCode(StatusCodes.Status500InternalServerError, ApiResponse.Failure(error.Message))
         };

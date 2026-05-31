@@ -1,7 +1,7 @@
 namespace Project.Application.DTOs.Settings
 {
     public record InfoSettingsDto(
-        string SchoolName,
+        string Name,
         string? LogoPath,
         string? Address,
         string? PhoneNumber,

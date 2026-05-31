@@ -37,7 +37,7 @@ namespace Project.Application.Services
                 await _repo.AddAsync(s, ct);
             }
 
-            s.Update(dto.SchoolName, dto.Address, dto.PhoneNumber, dto.Email);
+            s.Update(dto.Name, dto.Address, dto.PhoneNumber, dto.Email);
             await _uow.SaveChangesAsync(ct);
         }
 

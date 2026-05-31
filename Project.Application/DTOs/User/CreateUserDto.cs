@@ -12,5 +12,6 @@ namespace Project.Application.DTOs.User
         string State,
         string PinCode,
         string? BloodGroup = null,
-        string? EmergencyContact = null);
+        string? EmergencyContact = null,
+        string? Description = null);
 }

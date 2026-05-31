@@ -3,15 +3,15 @@ using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using Project.Application.Abstractions.ExternalServices;
-using Project.Application.DTOs.Report;
-using Project.Application.DTOs.Settings;
+using Project.Application.DTOs.Export;
+using System.Net;
 using System.Text;
 
 namespace Project.Infrastructure.Services
 {
-    public sealed class UserExportService : IUserExportService
+    public sealed class ExportService : IExportService
     {
-        public byte[] ExportPdf(IReadOnlyList<UserReportRowDto> rows, string? filterLabel = null, InfoHeaderDto? header = null)
+        public byte[] ExportPdf<TRow>(IReadOnlyList<TRow> rows, ExportOptions<TRow> options)
         {
             return Document.Create(container =>
             {
@@ -25,7 +25,7 @@ namespace Project.Infrastructure.Services
                     {
                         col.Item().BorderBottom(2).BorderColor(Colors.Blue.Darken2).PaddingBottom(6).Row(hRow =>
                         {
-                            if (header?.LogoBytes is { Length: > 0 } logo)
+                            if (options.Header?.LogoBytes is { Length: > 0 } logo)
                             {
                                 hRow.ConstantItem(60).AlignMiddle().Image(logo).FitArea();
                                 hRow.ConstantItem(10);
@@ -33,13 +33,13 @@ namespace Project.Infrastructure.Services
 
                             hRow.RelativeItem().Column(h =>
                             {
-                                h.Item().AlignCenter().Text(header?.SchoolName ?? "MANAGEMENT SYSTEM")
+                                h.Item().AlignCenter().Text(options.Header?.Name ?? "MANAGEMENT SYSTEM")
                                     .Bold().FontSize(16).FontColor(Colors.Blue.Darken2);
-                                if (!string.IsNullOrWhiteSpace(header?.Address))
-                                    h.Item().AlignCenter().Text(header.Address).FontSize(9).FontColor(Colors.Grey.Darken1);
-                                if (!string.IsNullOrWhiteSpace(header?.PhoneNumber))
-                                    h.Item().AlignCenter().Text($"Phone: {header.PhoneNumber}").FontSize(9).FontColor(Colors.Grey.Darken1);
-                                h.Item().AlignCenter().Text("Users Report").Bold().FontSize(12).FontColor(Colors.Grey.Darken2);
+                                if (!string.IsNullOrWhiteSpace(options.Header?.Address))
+                                    h.Item().AlignCenter().Text(options.Header.Address).FontSize(9).FontColor(Colors.Grey.Darken1);
+                                if (!string.IsNullOrWhiteSpace(options.Header?.PhoneNumber))
+                                    h.Item().AlignCenter().Text($"Phone: {options.Header.PhoneNumber}").FontSize(9).FontColor(Colors.Grey.Darken1);
+                                h.Item().AlignCenter().Text(options.ReportTitle).Bold().FontSize(12).FontColor(Colors.Grey.Darken2);
                             });
                         });
 
@@ -47,7 +47,7 @@ namespace Project.Infrastructure.Services
 
                         col.Item().Row(row =>
                         {
-                            row.RelativeItem().Text(filterLabel ?? "All Users").FontSize(9).FontColor(Colors.Grey.Darken1);
+                            row.RelativeItem().Text(options.FilterLabel ?? "All Records").FontSize(9).FontColor(Colors.Grey.Darken1);
                             row.RelativeItem().AlignRight().Text($"Generated: {DateTime.Today:dd/MM/yyyy}")
                                 .FontSize(9).FontColor(Colors.Grey.Medium);
                         });
@@ -58,20 +58,21 @@ namespace Project.Infrastructure.Services
                         {
                             table.ColumnsDefinition(c =>
                             {
-                                c.ConstantColumn(28);
-                                c.RelativeColumn(3);
-                                c.ConstantColumn(50);
-                                c.RelativeColumn(3);
-                                c.RelativeColumn(2);
-                                c.RelativeColumn(2);
+                                foreach (var column in options.Columns)
+                                {
+                                    if (column.ConstantWidth.HasValue)
+                                        c.ConstantColumn(column.ConstantWidth.Value);
+                                    else
+                                        c.RelativeColumn(column.RelativeWidth);
+                                }
                             });
 
                             void HeaderCell(string text) =>
                                 table.Cell().Background(Colors.Blue.Darken2).Padding(5)
                                     .Text(text).Bold().FontColor(Colors.White).FontSize(8);
 
-                            HeaderCell("#"); HeaderCell("Name"); HeaderCell("Gender");
-                            HeaderCell("Email"); HeaderCell("Phone"); HeaderCell("Blood Group");
+                            foreach (var column in options.Columns)
+                                HeaderCell(column.Header);
 
                             for (int i = 0; i < rows.Count; i++)
                             {
@@ -81,39 +82,39 @@ namespace Project.Infrastructure.Services
                                 void DataCell(string text) =>
                                     table.Cell().Background(bg).Padding(4).Text(text).FontSize(8);
 
-                                DataCell((i + 1).ToString()); DataCell(r.FullName); DataCell(r.Gender);
-                                DataCell(r.Email); DataCell(r.Phone); DataCell(r.BloodGroup ?? "");
+                                foreach (var column in options.Columns)
+                                    DataCell(column.ValueSelector(r, i));
                             }
                         });
 
                         col.Item().Height(8);
                         col.Item().BorderTop(1).BorderColor(Colors.Grey.Lighten1).PaddingTop(4)
-                            .Text($"Total Users: {rows.Count}").FontSize(8).SemiBold();
+                            .Text($"{options.TotalLabel}: {rows.Count}").FontSize(8).SemiBold();
                     });
                 });
             }).GeneratePdf();
         }
 
-        public byte[] ExportExcel(IReadOnlyList<UserReportRowDto> rows, string? filterLabel = null, InfoHeaderDto? header = null)
+        public byte[] ExportExcel<TRow>(IReadOnlyList<TRow> rows, ExportOptions<TRow> options)
         {
             using var workbook = new XLWorkbook();
-            var ws = workbook.Worksheets.Add("Users Report");
+            var ws = workbook.Worksheets.Add(options.ReportTitle);
+            int colCount = options.Columns.Count;
 
-            ws.Cell(1, 1).Value = $"{header?.SchoolName ?? "MANAGEMENT SYSTEM"} - Users Report";
+            ws.Cell(1, 1).Value = $"{options.Header?.Name ?? "MANAGEMENT SYSTEM"} - {options.ReportTitle}";
             ws.Cell(1, 1).Style.Font.Bold = true;
             ws.Cell(1, 1).Style.Font.FontSize = 14;
-            ws.Range(1, 1, 1, 6).Merge();
+            ws.Range(1, 1, 1, colCount).Merge();
 
-            ws.Cell(2, 1).Value = filterLabel ?? "All Users";
+            ws.Cell(2, 1).Value = options.FilterLabel ?? "All Records";
             ws.Cell(2, 1).Style.Font.FontColor = XLColor.Gray;
-            ws.Range(2, 1, 2, 6).Merge();
+            ws.Range(2, 1, 2, colCount).Merge();
 
-            int headerRow = 4;
-            string[] headers = ["#", "Name", "Gender", "Email", "Phone", "Blood Group"];
-            for (int col = 0; col < headers.Length; col++)
+            const int headerRow = 4;
+            for (int c = 0; c < options.Columns.Count; c++)
             {
-                var cell = ws.Cell(headerRow, col + 1);
-                cell.Value = headers[col];
+                var cell = ws.Cell(headerRow, c + 1);
+                cell.Value = options.Columns[c].Header;
                 cell.Style.Font.Bold = true;
                 cell.Style.Fill.BackgroundColor = XLColor.FromHtml("#1e40af");
                 cell.Style.Font.FontColor = XLColor.White;
@@ -122,30 +123,27 @@ namespace Project.Infrastructure.Services
 
             for (int i = 0; i < rows.Count; i++)
             {
-                var r = rows[i];
                 int row = headerRow + 1 + i;
-                ws.Cell(row, 1).Value = i + 1;
-                ws.Cell(row, 2).Value = r.FullName;
-                ws.Cell(row, 3).Value = r.Gender;
-                ws.Cell(row, 4).Value = r.Email;
-                ws.Cell(row, 5).Value = r.Phone;
-                ws.Cell(row, 6).Value = r.BloodGroup ?? "";
+                for (int c = 0; c < options.Columns.Count; c++)
+                    ws.Cell(row, c + 1).Value = options.Columns[c].ValueSelector(rows[i], i);
 
                 if (i % 2 == 1)
-                    ws.Range(row, 1, row, 6).Style.Fill.BackgroundColor = XLColor.FromHtml("#f9fafb");
+                    ws.Range(row, 1, row, colCount).Style.Fill.BackgroundColor = XLColor.FromHtml("#f9fafb");
             }
 
-            ws.Cell(headerRow + rows.Count + 2, 1).Value = $"Total Users: {rows.Count}";
+            ws.Cell(headerRow + rows.Count + 2, 1).Value = $"{options.TotalLabel}: {rows.Count}";
             ws.Cell(headerRow + rows.Count + 2, 1).Style.Font.Bold = true;
+
             ws.Columns().AdjustToContents();
-            ws.Column(2).Width = Math.Max(ws.Column(2).Width, 25);
+            foreach (var wsCol in ws.Columns())
+                if (wsCol.Width < 12) wsCol.Width = 12;
 
             using var ms = new MemoryStream();
             workbook.SaveAs(ms);
             return ms.ToArray();
         }
 
-        public byte[] ExportWord(IReadOnlyList<UserReportRowDto> rows, string? filterLabel = null, InfoHeaderDto? header = null)
+        public byte[] ExportWord<TRow>(IReadOnlyList<TRow> rows, ExportOptions<TRow> options)
         {
             var sb = new StringBuilder();
             sb.AppendLine("<html><head><meta charset='utf-8'><style>");
@@ -158,22 +156,28 @@ namespace Project.Infrastructure.Services
             sb.AppendLine("td{border:1px solid #e5e7eb;padding:5px 8px}");
             sb.AppendLine("tr:nth-child(even) td{background-color:#f9fafb}");
             sb.AppendLine("</style></head><body>");
-            sb.AppendLine($"<h1>{System.Net.WebUtility.HtmlEncode(header?.SchoolName ?? "MANAGEMENT SYSTEM")}</h1>");
-            if (!string.IsNullOrWhiteSpace(header?.Address))
-                sb.AppendLine($"<p class='sub'>{System.Net.WebUtility.HtmlEncode(header.Address)}</p>");
-            if (!string.IsNullOrWhiteSpace(header?.PhoneNumber))
-                sb.AppendLine($"<p class='sub'>Phone: {System.Net.WebUtility.HtmlEncode(header.PhoneNumber)}</p>");
-            sb.AppendLine("<h2>Users Report</h2>");
-            sb.AppendLine($"<div>{filterLabel ?? "All Users"} &nbsp; Generated: {DateTime.Today:dd/MM/yyyy}</div>");
-            sb.AppendLine("<table><tr><th>#</th><th>Name</th><th>Gender</th><th>Email</th><th>Phone</th><th>Blood Group</th></tr>");
+            sb.AppendLine($"<h1>{WebUtility.HtmlEncode(options.Header?.Name ?? "MANAGEMENT SYSTEM")}</h1>");
+            if (!string.IsNullOrWhiteSpace(options.Header?.Address))
+                sb.AppendLine($"<p class='sub'>{WebUtility.HtmlEncode(options.Header.Address)}</p>");
+            if (!string.IsNullOrWhiteSpace(options.Header?.PhoneNumber))
+                sb.AppendLine($"<p class='sub'>Phone: {WebUtility.HtmlEncode(options.Header.PhoneNumber)}</p>");
+            sb.AppendLine($"<h2>{WebUtility.HtmlEncode(options.ReportTitle)}</h2>");
+            sb.AppendLine($"<div>{WebUtility.HtmlEncode(options.FilterLabel ?? "All Records")} &nbsp; Generated: {DateTime.Today:dd/MM/yyyy}</div>");
+
+            sb.Append("<table><tr>");
+            foreach (var column in options.Columns)
+                sb.Append($"<th>{WebUtility.HtmlEncode(column.Header)}</th>");
+            sb.AppendLine("</tr>");
 
             for (int i = 0; i < rows.Count; i++)
             {
-                var r = rows[i];
-                sb.AppendLine($"<tr><td>{i + 1}</td><td>{r.FullName}</td><td>{r.Gender}</td><td>{r.Email}</td><td>{r.Phone}</td><td>{r.BloodGroup ?? ""}</td></tr>");
+                sb.Append("<tr>");
+                foreach (var column in options.Columns)
+                    sb.Append($"<td>{WebUtility.HtmlEncode(column.ValueSelector(rows[i], i))}</td>");
+                sb.AppendLine("</tr>");
             }
 
-            sb.AppendLine($"</table><div style='margin-top:12px;font-weight:bold'>Total Users: {rows.Count}</div></body></html>");
+            sb.AppendLine($"</table><div style='margin-top:12px;font-weight:bold'>{options.TotalLabel}: {rows.Count}</div></body></html>");
             return Encoding.UTF8.GetBytes(sb.ToString());
         }
     }

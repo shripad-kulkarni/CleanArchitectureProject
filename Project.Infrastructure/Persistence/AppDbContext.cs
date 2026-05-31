@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Project.Domain.Aggregates;
+using Project.Domain.Aggregates.ContactAggregate;
 using Project.Domain.Aggregates.PaymentAggregate;
 using Project.Domain.Aggregates.UserAggregate;
 using Project.Domain.Entities;
@@ -30,6 +31,7 @@ namespace Project.Infrastructure.Persistence
         public DbSet<MenuSetting> MenuSettings => Set<MenuSetting>();
         public DbSet<InfoSetting> InfoSettings => Set<InfoSetting>();
         public DbSet<Payment> Payments => Set<Payment>();
+        public DbSet<ContactMessage> ContactMessages => Set<ContactMessage>();
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

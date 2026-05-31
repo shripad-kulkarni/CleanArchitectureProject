@@ -7,5 +7,6 @@ namespace Project.Application.DTOs.User
         string Street,
         string City,
         string State,
-        string PinCode);
+        string PinCode,
+        string? Description = null);
 }

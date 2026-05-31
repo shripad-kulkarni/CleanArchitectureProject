@@ -9,16 +9,19 @@ namespace Project.Application.Mapper
             Id: user.Id,
             FirstName: user.FirstName,
             LastName: user.LastName,
-            Email: user.Email.Value,
-            Phone: user.Phone.Value,
+            Email: user.Email,
+            Phone: user.Phone,
             DateOfBirth: user.DateOfBirth,
             Gender: user.Gender.ToString(),
-            Street: user.Address.Street,
-            City: user.Address.City,
-            State: user.Address.State,
-            PinCode: user.Address.PinCode,
+            Street: user.Street,
+            City: user.City,
+            State: user.State,
+            PinCode: user.PinCode,
             BloodGroup: user.BloodGroup,
-            EmergencyContact: user.EmergencyContact);
+            EmergencyContact: user.EmergencyContact,
+            Description: user.Description,
+            ProfilePhotoUrl: user.ProfilePhotoUrl,
+            IntroVideoUrl: user.IntroVideoUrl);
 
         public static UserDocumentDto ToDocumentDto(UserDocument doc) => new(
             Id: doc.Id,

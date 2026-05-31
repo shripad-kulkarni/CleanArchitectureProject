@@ -5,8 +5,10 @@ using Project.Application.Abstractions.Identity;
 using Project.Application.Abstractions.Persistence;
 using Project.Application.Abstractions.ExternalServices;
 using Project.Application.Abstractions.Services;
+using Project.Application.DTOs.Contact;
 using Project.Application.DTOs.User;
 using Project.Application.Services;
+using Project.Application.Validators.Contact;
 using Project.Application.Validators.User;
 using System;
 using System.Collections.Generic;
@@ -25,7 +27,9 @@ namespace Project.Application.DependencyInjection
 
             // Validators
             services.AddScoped<IValidator<CreateUserDto>, CreateUserValidator>();
+            services.AddScoped<IValidator<CreateContactMessageDto>, CreateContactMessageValidator>();
 
+            services.AddScoped<IContactService, ContactService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IInfoSettingsService, InfoSettingsService>();
             services.AddScoped<IUserService, UserService>();

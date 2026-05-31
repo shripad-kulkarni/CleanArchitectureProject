@@ -5,6 +5,7 @@ using Project.API.Controllers.Base;
 using Project.API.CustomResults;
 using Project.Application.Abstractions.ExternalServices;
 using Project.Application.Abstractions.Services;
+using Project.Application.DTOs.Export;
 using Project.Application.DTOs.Report;
 using Project.Application.DTOs.Settings;
 
@@ -16,16 +17,16 @@ namespace Project.API.Controllers
     public sealed class ReportsController : ApiControllerBase
     {
         private readonly IUserService _userService;
-        private readonly IUserExportService _userExportService;
+        private readonly IExportService _exportService;
         private readonly IInfoSettingsService _settingsService;
 
         public ReportsController(
             IUserService userService,
-            IUserExportService userExportService,
+            IExportService exportService,
             IInfoSettingsService settingsService)
         {
             _userService = userService;
-            _userExportService = userExportService;
+            _exportService = exportService;
             _settingsService = settingsService;
         }
 
@@ -44,9 +45,8 @@ namespace Project.API.Controllers
         {
             var result = await _userService.GetReportDataAsync(new UserReportQueryDto(searchTerm, gender), ct);
             if (result.IsFailure) return StatusCode(500, ApiResponse.Failure(result.Error.Message));
-            var header = await BuildHeaderAsync(ct);
-            return File(_userExportService.ExportPdf(result.Value, BuildFilterLabel(searchTerm, gender), header),
-                "application/pdf", "UsersReport.pdf");
+            var options = await BuildUserExportOptionsAsync(searchTerm, gender, ct);
+            return File(_exportService.ExportPdf(result.Value, options), "application/pdf", "UsersReport.pdf");
         }
 
         [HttpGet("users/export/excel")]
@@ -55,8 +55,8 @@ namespace Project.API.Controllers
         {
             var result = await _userService.GetReportDataAsync(new UserReportQueryDto(searchTerm, gender), ct);
             if (result.IsFailure) return StatusCode(500, ApiResponse.Failure(result.Error.Message));
-            var header = await BuildHeaderAsync(ct);
-            return File(_userExportService.ExportExcel(result.Value, BuildFilterLabel(searchTerm, gender), header),
+            var options = await BuildUserExportOptionsAsync(searchTerm, gender, ct);
+            return File(_exportService.ExportExcel(result.Value, options),
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "UsersReport.xlsx");
         }
 
@@ -66,9 +66,30 @@ namespace Project.API.Controllers
         {
             var result = await _userService.GetReportDataAsync(new UserReportQueryDto(searchTerm, gender), ct);
             if (result.IsFailure) return StatusCode(500, ApiResponse.Failure(result.Error.Message));
+            var options = await BuildUserExportOptionsAsync(searchTerm, gender, ct);
+            return File(_exportService.ExportWord(result.Value, options), "application/msword", "UsersReport.doc");
+        }
+
+        private async Task<ExportOptions<UserReportRowDto>> BuildUserExportOptionsAsync(
+            string? searchTerm, string? gender, CancellationToken ct)
+        {
             var header = await BuildHeaderAsync(ct);
-            return File(_userExportService.ExportWord(result.Value, BuildFilterLabel(searchTerm, gender), header),
-                "application/msword", "UsersReport.doc");
+            return new ExportOptions<UserReportRowDto>
+            {
+                ReportTitle = "Users Report",
+                FilterLabel = BuildFilterLabel(searchTerm, gender) ?? "All Users",
+                Header = header,
+                TotalLabel = "Total Users",
+                Columns =
+                [
+                    new("#",           (_, i) => (i + 1).ToString(),  ConstantWidth: 28),
+                    new("Name",        (r, _) => r.FullName,           RelativeWidth: 3),
+                    new("Gender",      (r, _) => r.Gender,             ConstantWidth: 50),
+                    new("Email",       (r, _) => r.Email,              RelativeWidth: 3),
+                    new("Phone",       (r, _) => r.Phone,              RelativeWidth: 2),
+                    new("Blood Group", (r, _) => r.BloodGroup ?? "",   RelativeWidth: 2),
+                ]
+            };
         }
 
         private async Task<InfoHeaderDto?> BuildHeaderAsync(CancellationToken ct)
@@ -76,7 +97,7 @@ namespace Project.API.Controllers
             try
             {
                 var settings = await _settingsService.GetAsync(ct);
-                return new InfoHeaderDto(settings.SchoolName, settings.Address, settings.PhoneNumber, null);
+                return new InfoHeaderDto(settings.Name, settings.Address, settings.PhoneNumber, null);
             }
             catch
             {

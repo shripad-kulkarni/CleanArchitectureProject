@@ -20,7 +20,7 @@ namespace Project.Application.Specifications.Users
                     && u.Gender == genderValue
                     && (u.FirstName.ToLower().Contains(term)
                         || u.LastName.ToLower().Contains(term)
-                        || u.Email.Value.ToLower().Contains(term)));
+                        || u.Email.ToLower().Contains(term)));
             }
             else if (hasSearch)
             {
@@ -28,7 +28,7 @@ namespace Project.Application.Specifications.Users
                 AddCriteria(u => !u.IsDeleted
                     && (u.FirstName.ToLower().Contains(term)
                         || u.LastName.ToLower().Contains(term)
-                        || u.Email.Value.ToLower().Contains(term)));
+                        || u.Email.ToLower().Contains(term)));
             }
             else if (hasGender)
             {

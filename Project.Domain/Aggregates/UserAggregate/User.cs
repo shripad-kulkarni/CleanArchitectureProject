@@ -1,6 +1,5 @@
 using Project.Domain.Enums;
 using Project.Domain.Primitives;
-using Project.Domain.ValueObjects;
 
 namespace Project.Domain.Aggregates.UserAggregate
 {
@@ -13,27 +12,39 @@ namespace Project.Domain.Aggregates.UserAggregate
         public string FirstName { get; private set; } = string.Empty;
         public string LastName { get; private set; } = string.Empty;
         public string FullName => $"{FirstName} {LastName}";
-        public Email Email { get; private set; } = null!;
-        public PhoneNumber Phone { get; private set; } = null!;
+        public string Email { get; private set; } = string.Empty;
+        public string Phone { get; private set; } = string.Empty;
         public DateOnly DateOfBirth { get; private set; }
         public Gender Gender { get; private set; }
-        public Address Address { get; private set; } = null!;
+        public string Street { get; private set; } = string.Empty;
+        public string City { get; private set; } = string.Empty;
+        public string State { get; private set; } = string.Empty;
+        public string PinCode { get; private set; } = string.Empty;
+        public string Country { get; private set; } = "India";
 
         public string? BloodGroup { get; private set; }
         public string? EmergencyContact { get; private set; }
+        public string? Description { get; private set; }
+        public string? ProfilePhotoUrl { get; private set; }
+        public string? IntroVideoUrl { get; private set; }
 
         public IReadOnlyCollection<UserDocument> Documents => _documents.AsReadOnly();
 
         public static User Create(
             string firstName,
             string lastName,
-            Email email,
-            PhoneNumber phone,
+            string email,
+            string phone,
             DateOnly dateOfBirth,
             Gender gender,
-            Address address,
+            string street,
+            string city,
+            string state,
+            string pinCode,
+            string country = "India",
             string? bloodGroup = null,
-            string? emergencyContact = null)
+            string? emergencyContact = null,
+            string? description = null)
         {
             if (string.IsNullOrWhiteSpace(firstName)) throw new ArgumentException("First name is required.");
             if (string.IsNullOrWhiteSpace(lastName)) throw new ArgumentException("Last name is required.");
@@ -42,21 +53,30 @@ namespace Project.Domain.Aggregates.UserAggregate
             {
                 FirstName = firstName,
                 LastName = lastName,
-                Email = email,
+                Email = email.ToLowerInvariant(),
                 Phone = phone,
                 DateOfBirth = dateOfBirth,
                 Gender = gender,
-                Address = address,
+                Street = street,
+                City = city,
+                State = state,
+                PinCode = pinCode,
+                Country = country,
                 BloodGroup = bloodGroup,
-                EmergencyContact = emergencyContact
+                EmergencyContact = emergencyContact,
+                Description = description
             };
         }
 
         public void Update(
             string firstName,
             string lastName,
-            PhoneNumber phone,
-            Address address)
+            string phone,
+            string street,
+            string city,
+            string state,
+            string pinCode,
+            string? description = null)
         {
             if (string.IsNullOrWhiteSpace(firstName)) throw new ArgumentException("First name is required.");
             if (string.IsNullOrWhiteSpace(lastName)) throw new ArgumentException("Last name is required.");
@@ -64,7 +84,11 @@ namespace Project.Domain.Aggregates.UserAggregate
             FirstName = firstName;
             LastName = lastName;
             Phone = phone;
-            Address = address;
+            Street = street;
+            City = city;
+            State = state;
+            PinCode = pinCode;
+            Description = description;
         }
 
         public void UpdateProfile(string? bloodGroup, string? emergencyContact)
@@ -72,6 +96,9 @@ namespace Project.Domain.Aggregates.UserAggregate
             BloodGroup = bloodGroup;
             EmergencyContact = emergencyContact;
         }
+
+        public void SetProfilePhotoUrl(string? url) => ProfilePhotoUrl = url;
+        public void SetIntroVideoUrl(string? url) => IntroVideoUrl = url;
 
         public void AddDocument(UserDocument document)
         {

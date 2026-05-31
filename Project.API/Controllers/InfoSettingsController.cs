@@ -10,7 +10,7 @@ namespace Project.API.Controllers
 {
     [ApiController]
     [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/school-settings")]
+    [Route("api/v{version:apiVersion}/settings")]
     [Authorize]
     public sealed class InfoSettingsController : ControllerBase
     {
@@ -22,6 +22,7 @@ namespace Project.API.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> Get(CancellationToken ct)
         {
             var dto = await _service.GetAsync(ct);

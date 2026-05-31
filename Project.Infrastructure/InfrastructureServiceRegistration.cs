@@ -11,6 +11,8 @@ using Project.Infrastructure.Hubs;
 using Project.Infrastructure.Identity;
 using Project.Infrastructure.Options;
 using Project.Infrastructure.Persistence;
+using DinkToPdf;
+using DinkToPdf.Contracts;
 using QuestPDF.Infrastructure;
 using Project.Infrastructure.Services;
 using System.Text;
@@ -117,8 +119,10 @@ namespace Project.Infrastructure
             services.AddScoped<IDateTimeProvider, IndianDateTimeProvider>();
             services.AddScoped<IFileStorageService, LocalFileStorageService>();
             services.AddScoped<IEmailService, EmailService>();
-            services.AddSingleton<IPdfGeneratorService, QuestPdfGeneratorService>();
-            services.AddSingleton<IUserExportService, UserExportService>();
+            services.AddSingleton<IExportService, ExportService>();
+            services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+            services.AddScoped<RazorViewRenderer>();
+            services.AddScoped<IUserProfileReportService, UserProfileReportService>();
  
             services.AddScoped<IMenuSettingRepository, MenuSettingRepository>();
             services.AddScoped<IPaymentGatewayService, RazorpayService>();

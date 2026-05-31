@@ -37,6 +37,8 @@ namespace Project.Application.Validators.User
             RuleFor(x => x.City).NotEmpty().WithMessage("City is required.").MaximumLength(100);
             RuleFor(x => x.State).NotEmpty().WithMessage("State is required.").MaximumLength(100);
             RuleFor(x => x.PinCode).NotEmpty().WithMessage("Pin code is required.").MaximumLength(20);
+
+            RuleFor(x => x.Description).MaximumLength(500).WithMessage("Description must not exceed 500 characters.");
         }
     }
 }

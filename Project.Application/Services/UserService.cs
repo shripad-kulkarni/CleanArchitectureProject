@@ -13,7 +13,6 @@ using Project.Application.Specifications.Users;
 using Project.Domain.Aggregates.UserAggregate;
 using Project.Domain.Constants;
 using Project.Domain.Enums;
-using Project.Domain.ValueObjects;
 
 namespace Project.Application.Services
 {
@@ -23,32 +22,33 @@ namespace Project.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IValidator<CreateUserDto> _createValidator;
         private readonly IFileStorageService _fileStorage;
-        private readonly IPdfGeneratorService _pdfGenerator;
+        private readonly IUserProfileReportService _profileReportService;
 
         public UserService(
             IRepository<User> repository,
             IUnitOfWork unitOfWork,
             IValidator<CreateUserDto> createValidator,
             IFileStorageService fileStorage,
-            IPdfGeneratorService pdfGenerator)
+            IUserProfileReportService profileReportService)
         {
             _repository = repository;
             _unitOfWork = unitOfWork;
             _createValidator = createValidator;
             _fileStorage = fileStorage;
-            _pdfGenerator = pdfGenerator;
+            _profileReportService = profileReportService;
         }
 
-        public async Task<Result<UserDto>> CreateAsync(CreateUserDto dto, CancellationToken ct = default)
+        public async Task<Result<UserDto>> CreateAsync(CreateUserDto dto,
+            Stream? profilePhotoStream = null, string? profilePhotoFileName = null,
+            Stream? introVideoStream = null, string? introVideoFileName = null,
+            CancellationToken ct = default)
         {
             var validation = await _createValidator.ValidateAsync(dto, ct);
             if (!validation.IsValid)
-            {
-                var messages = string.Join("; ", validation.Errors.Select(e => e.ErrorMessage));
-                return Result<UserDto>.Failure(Error.Validation("User.Validation", messages));
-            }
+                return Result<UserDto>.Failure(
+                    Error.ValidationErrors("User.Validation", validation.Errors.Select(e => e.ErrorMessage)));
 
-            if (await _repository.ExistsAsync(u => u.Email.Value == dto.Email && !u.IsDeleted, ct))
+            if (await _repository.ExistsAsync(u => u.Email == dto.Email.ToLowerInvariant() && !u.IsDeleted, ct))
                 return Result<UserDto>.Failure(Error.Conflict("User.EmailExists",
                     $"Email '{dto.Email}' is already registered."));
 
@@ -56,18 +56,34 @@ namespace Project.Application.Services
                 return Result<UserDto>.Failure(Error.Validation("User.InvalidGender",
                     "Gender must be Male, Female, or Other."));
 
-            var email = Email.Create(dto.Email);
-            var phone = PhoneNumber.Create(dto.PhoneNumber);
-            var address = Address.Create(dto.Street, dto.City, dto.State, dto.PinCode);
-
             var user = User.Create(
-                dto.FirstName, dto.LastName, email, phone,
-                dto.DateOfBirth, gender, address,
+                dto.FirstName, dto.LastName, dto.Email, dto.PhoneNumber,
+                dto.DateOfBirth, gender,
+                dto.Street, dto.City, dto.State, dto.PinCode,
                 bloodGroup: dto.BloodGroup,
-                emergencyContact: dto.EmergencyContact);
+                emergencyContact: dto.EmergencyContact,
+                description: dto.Description);
 
             await _repository.AddAsync(user, ct);
-            await _unitOfWork.SaveChangesAsync(ct);
+            await _unitOfWork.SaveChangesAsync(ct); // save first so user.Id is set
+
+            if (profilePhotoStream != null && profilePhotoFileName != null)
+            {
+                var path = await _fileStorage.UploadAsync(profilePhotoStream, profilePhotoFileName, $"users/{user.Id}/photo", ct);
+                user.SetProfilePhotoUrl(_fileStorage.GetFileUrl(path));
+            }
+
+            if (introVideoStream != null && introVideoFileName != null)
+            {
+                var path = await _fileStorage.UploadAsync(introVideoStream, introVideoFileName, $"users/{user.Id}/video", ct);
+                user.SetIntroVideoUrl(_fileStorage.GetFileUrl(path));
+            }
+
+            if (profilePhotoStream != null || introVideoStream != null)
+            {
+                _repository.Update(user);
+                await _unitOfWork.SaveChangesAsync(ct);
+            }
 
             return Result<UserDto>.Success(UserMapper.ToDto(user));
         }
@@ -89,20 +105,36 @@ namespace Project.Application.Services
             return Result<PagedList<UserDto>>.Success(new PagedList<UserDto>(dtos, totalCount, filter.PageNumber, filter.PageSize));
         }
 
-        public async Task<Result<UserDto>> UpdateAsync(int id, UpdateUserDto dto, CancellationToken ct = default)
+        public async Task<Result<UserDto>> UpdateAsync(int id, UpdateUserDto dto,
+            Stream? profilePhotoStream = null, string? profilePhotoFileName = null,
+            Stream? introVideoStream = null, string? introVideoFileName = null,
+            CancellationToken ct = default)
         {
             var user = await _repository.FirstOrDefaultAsync(new UserByIdSpecification(id), ct);
             if (user is null)
                 return Result<UserDto>.Failure(Error.NotFound("User.NotFound", $"User with id {id} was not found."));
 
             user.Update(dto.FirstName, dto.LastName,
-                PhoneNumber.Create(dto.Phone),
-                Address.Create(dto.Street, dto.City, dto.State, dto.PinCode));
+                dto.Phone, dto.Street, dto.City, dto.State, dto.PinCode,
+                dto.Description);
+
+            if (profilePhotoStream != null && profilePhotoFileName != null)
+            {
+                var path = await _fileStorage.UploadAsync(profilePhotoStream, profilePhotoFileName, $"users/{id}/photo", ct);
+                user.SetProfilePhotoUrl(_fileStorage.GetFileUrl(path));
+            }
+
+            if (introVideoStream != null && introVideoFileName != null)
+            {
+                var path = await _fileStorage.UploadAsync(introVideoStream, introVideoFileName, $"users/{id}/video", ct);
+                user.SetIntroVideoUrl(_fileStorage.GetFileUrl(path));
+            }
 
             _repository.Update(user);
             await _unitOfWork.SaveChangesAsync(ct);
+            var user1 = await _repository.FirstOrDefaultAsync(new UserByIdSpecification(id), ct);
 
-            return Result<UserDto>.Success(UserMapper.ToDto(user));
+            return Result<UserDto>.Success(UserMapper.ToDto(user1));
         }
 
         public async Task<Result> DeleteAsync(int id, CancellationToken ct = default)
@@ -218,7 +250,7 @@ namespace Project.Application.Services
                     $"'{documentType}' cannot be generated — it must be uploaded."));
 
             var userDto = UserMapper.ToDto(user);
-            var pdfBytes = _pdfGenerator.GenerateUserProfileReport(userDto);
+            var pdfBytes = await _profileReportService.GenerateAsync(userDto, ct);
 
             return Result<GeneratedDocumentResult>.Success(
                 new GeneratedDocumentResult(pdfBytes, $"UserReport_{user.Id}.pdf", "application/pdf"));
@@ -236,8 +268,8 @@ namespace Project.Application.Services
                     u.Id,
                     $"{u.FirstName} {u.LastName}",
                     u.Gender.ToString(),
-                    u.Phone.Value,
-                    u.Email.Value,
+                    u.Phone,
+                    u.Email,
                     u.BloodGroup,
                     u.EmergencyContact))
                 .ToList();
