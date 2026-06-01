@@ -5,14 +5,22 @@
 namespace Project.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class adddescription : Migration
+    public partial class AddChatFileColumns : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "Description",
-                table: "Users",
+                name: "FileName",
+                table: "ChatMessages",
+                type: "varchar(255)",
+                maxLength: 255,
+                nullable: true)
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.AddColumn<string>(
+                name: "FileUrl",
+                table: "ChatMessages",
                 type: "varchar(1000)",
                 maxLength: 1000,
                 nullable: true)
@@ -23,8 +31,12 @@ namespace Project.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Description",
-                table: "Users");
+                name: "FileName",
+                table: "ChatMessages");
+
+            migrationBuilder.DropColumn(
+                name: "FileUrl",
+                table: "ChatMessages");
         }
     }
 }

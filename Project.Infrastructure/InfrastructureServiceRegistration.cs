@@ -114,6 +114,7 @@ namespace Project.Infrastructure
             services.AddHttpContextAccessor();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+            services.AddScoped<IIdentityUserLookupService, IdentityUserLookupService>();
 
             // External Services
             services.AddScoped<IDateTimeProvider, IndianDateTimeProvider>();

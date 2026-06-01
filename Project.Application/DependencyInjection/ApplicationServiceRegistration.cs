@@ -29,6 +29,7 @@ namespace Project.Application.DependencyInjection
             services.AddScoped<IValidator<CreateUserDto>, CreateUserValidator>();
             services.AddScoped<IValidator<CreateContactMessageDto>, CreateContactMessageValidator>();
 
+            services.AddScoped<IChatService, ChatService>();
             services.AddScoped<IContactService, ContactService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IInfoSettingsService, InfoSettingsService>();

@@ -15,7 +15,7 @@ namespace Project.API.DependencyInjection
 
             services.AddApiVersioningConfig();
             services.AddSwaggerConfig();
-            services.AddCorsPolicies(configuration);
+          //  services.AddCorsPolicies(configuration);
 
             services.AddExceptionHandler<GlobalExceptionHandler>();
             services.AddProblemDetails();

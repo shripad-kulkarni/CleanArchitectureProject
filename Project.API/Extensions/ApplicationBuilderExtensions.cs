@@ -14,6 +14,12 @@ namespace Project.API.Extensions
             return app;
         }
 
+        public static IEndpointRouteBuilder MapChatHub(this IEndpointRouteBuilder app)
+        {
+            app.MapHub<ChatHub>("/hubs/chat");
+            return app;
+        }
+
         public static async Task<IApplicationBuilder> UseDbInitializerAsync(
             this IApplicationBuilder app)
         {

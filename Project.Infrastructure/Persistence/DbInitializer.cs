@@ -13,7 +13,11 @@ namespace Project.Infrastructure.Persistence
             RoleManager<IdentityRole> roleManager,
             UserManager<ApplicationUser> userManager)
         {
-            await db.Database.MigrateAsync();
+            if (db.Database.GetPendingMigrations().Any())
+            {
+                await db.Database.MigrateAsync();
+            }
+               
             await RoleSeeder.SeedAsync(roleManager);
             await AdminSeeder.SeedAsync(userManager);
             await MenuSettingSeeder.SeedAsync(db);
