@@ -11,7 +11,7 @@ namespace Project.API.Controllers
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/settings")]
-    [Authorize]
+     
     public sealed class InfoSettingsController : ControllerBase
     {
         private readonly IInfoSettingsService _service;
@@ -38,7 +38,7 @@ namespace Project.API.Controllers
         }
 
         [HttpPost("logo")]
-        [Authorize(Roles = RoleConstants.Admin)]
+      //  [Authorize(Roles = RoleConstants.Admin)]
         public async Task<IActionResult> UploadLogo(IFormFile? file, CancellationToken ct)
         {
             if (file is null || file.Length == 0)

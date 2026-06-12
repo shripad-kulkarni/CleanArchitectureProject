@@ -124,6 +124,7 @@ namespace Project.Infrastructure
             services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
             services.AddScoped<RazorViewRenderer>();
             services.AddScoped<IUserProfileReportService, UserProfileReportService>();
+            services.AddScoped<ICertificateService, CertificateService>();
  
             services.AddScoped<IMenuSettingRepository, MenuSettingRepository>();
             services.AddScoped<IPaymentGatewayService, RazorpayService>();

@@ -23,19 +23,22 @@ namespace Project.Application.Services
         private readonly IValidator<CreateUserDto> _createValidator;
         private readonly IFileStorageService _fileStorage;
         private readonly IUserProfileReportService _profileReportService;
+        private readonly ICertificateService _certificateService;
 
         public UserService(
             IRepository<User> repository,
             IUnitOfWork unitOfWork,
             IValidator<CreateUserDto> createValidator,
             IFileStorageService fileStorage,
-            IUserProfileReportService profileReportService)
+            IUserProfileReportService profileReportService,
+            ICertificateService certificateService)
         {
             _repository = repository;
             _unitOfWork = unitOfWork;
             _createValidator = createValidator;
             _fileStorage = fileStorage;
             _profileReportService = profileReportService;
+            _certificateService = certificateService;
         }
 
         public async Task<Result<UserDto>> CreateAsync(CreateUserDto dto,
@@ -245,15 +248,24 @@ namespace Project.Application.Services
                 return Result<GeneratedDocumentResult>.Failure(Error.Validation("User.InvalidDocumentType",
                     $"'{documentType}' is not a valid document type."));
 
-            if (docType is not DocumentType.ProfileReport)
-                return Result<GeneratedDocumentResult>.Failure(Error.Validation("User.NotGeneratable",
-                    $"'{documentType}' cannot be generated — it must be uploaded."));
-
             var userDto = UserMapper.ToDto(user);
-            var pdfBytes = await _profileReportService.GenerateAsync(userDto, ct);
 
-            return Result<GeneratedDocumentResult>.Success(
-                new GeneratedDocumentResult(pdfBytes, $"UserReport_{user.Id}.pdf", "application/pdf"));
+            if (docType == DocumentType.ProfileReport)
+            {
+                var pdfBytes = await _profileReportService.GenerateAsync(userDto, ct);
+                return Result<GeneratedDocumentResult>.Success(
+                    new GeneratedDocumentResult(pdfBytes, $"UserReport_{user.Id}.pdf", "application/pdf"));
+            }
+
+            if (docType == DocumentType.Certificate)
+            {
+                var pdfBytes = await _certificateService.GenerateAsync(userDto, ct);
+                return Result<GeneratedDocumentResult>.Success(
+                    new GeneratedDocumentResult(pdfBytes, $"Certificate_{user.Id}.pdf", "application/pdf"));
+            }
+
+            return Result<GeneratedDocumentResult>.Failure(Error.Validation("User.NotGeneratable",
+                $"'{documentType}' cannot be generated — it must be uploaded."));
         }
 
         public async Task<Result<IReadOnlyList<UserReportRowDto>>> GetReportDataAsync(

@@ -18,7 +18,7 @@ namespace Project.API.Extensions
                     {
                         Title = "Project API",
                         Version = description.ApiVersion.ToString(),
-                        Description = "School Management System REST API"
+                        Description = "Project REST API"
                     });
                 }
 

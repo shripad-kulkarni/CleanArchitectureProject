@@ -1,12 +1,14 @@
 @model Project.Application.DTOs.User.UserDto
+@using System.Globalization
 @{
     Layout = null;
+    var mr = new CultureInfo("mr-IN");
 }
 <!DOCTYPE html>
-<html lang="en">
+<html lang="mr">
 <head>
     <meta charset="utf-8" />
-    <title>User Profile — @Model.FullName</title>
+    <title>वापरकर्ता प्रोफाइल — @Model.FullName</title>
     <style>
         * {
             margin: 0;
@@ -14,18 +16,24 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            font-size: 10pt;
+            font-family: 'Noto Sans Devanagari', 'Mangal', 'Nirmala UI', Arial, sans-serif;
+            font-size: 12pt;
             color: #1f2937;
             background: #ffffff;
         }
 
         /* ── Header ─────────────────────────────────────── */
         .header {
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 60%, #2563eb 100%);
+            background-color: #1e40af; /* solid fallback for PDF engines */
+            background-image: linear-gradient(135deg, #1e3a8a 0%, #1e40af 60%, #2563eb 100%);
             color: #ffffff;
-            padding: 28px 32px 24px;
+            padding: 30px 34px 26px;
             position: relative;
         }
 
@@ -36,22 +44,21 @@
         }
 
         .header-name {
-            font-size: 20pt;
+            font-size: 24pt;
             font-weight: bold;
             letter-spacing: 0.3px;
         }
 
         .header-subtitle {
-            font-size: 10pt;
-            opacity: 0.80;
-            margin-top: 4px;
+            font-size: 12pt;
+            opacity: 0.85;
+            margin-top: 5px;
             letter-spacing: 0.5px;
-            text-transform: uppercase;
         }
 
         .header-meta {
-            font-size: 8pt;
-            opacity: 0.65;
+            font-size: 10pt;
+            opacity: 0.70;
             margin-top: 10px;
         }
 
@@ -59,34 +66,34 @@
             text-align: right;
         }
 
-        .header-id .id-label {
-            font-size: 8pt;
-            opacity: 0.65;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+            .header-id .id-label {
+                font-size: 10pt;
+                opacity: 0.70;
+                letter-spacing: 0.5px;
+            }
 
-        .header-id .id-value {
-            font-size: 18pt;
-            font-weight: bold;
-            opacity: 0.30;
-            line-height: 1;
-        }
+            .header-id .id-value {
+                font-size: 22pt;
+                font-weight: bold;
+                opacity: 0.35;
+                line-height: 1;
+            }
 
         .header-bar {
             height: 4px;
-            background: linear-gradient(to right, #93c5fd, #bfdbfe, #ffffff30);
+            background-color: #93c5fd;
+            background-image: linear-gradient(to right, #93c5fd, #bfdbfe, rgba(255,255,255,0.19));
             margin-top: 18px;
         }
 
         /* ── Body wrapper ────────────────────────────────── */
         .body {
-            padding: 20px 28px 28px;
+            padding: 22px 30px 30px;
         }
 
         /* ── Section ─────────────────────────────────────── */
         .section {
-            margin-bottom: 18px;
+            margin-bottom: 20px;
         }
 
         .section-title {
@@ -98,17 +105,16 @@
 
         .section-title-bar {
             width: 4px;
-            height: 16px;
+            height: 18px;
             background: #1e40af;
             border-radius: 2px;
             flex-shrink: 0;
         }
 
         .section-title-text {
-            font-size: 9pt;
+            font-size: 12pt;
             font-weight: bold;
             color: #1e40af;
-            text-transform: uppercase;
             letter-spacing: 0.6px;
         }
 
@@ -122,25 +128,25 @@
             overflow: hidden;
         }
 
-        .info-table td {
-            padding: 8px 12px;
-            font-size: 9.5pt;
-            border: 1px solid #e5e7eb;
-            vertical-align: top;
-        }
+            .info-table td {
+                padding: 9px 12px;
+                font-size: 11.5pt;
+                border: 1px solid #e5e7eb;
+                vertical-align: top;
+            }
 
-        .info-table td.lbl {
-            background: #f8fafc;
-            font-weight: 600;
-            color: #374151;
-            width: 18%;
-            white-space: nowrap;
-        }
+                .info-table td.lbl {
+                    background: #f8fafc;
+                    font-weight: 600;
+                    color: #374151;
+                    width: 18%;
+                    white-space: nowrap;
+                }
 
-        .info-table td.val {
-            color: #111827;
-            width: 32%;
-        }
+                .info-table td.val {
+                    color: #111827;
+                    width: 32%;
+                }
 
         /* ── Divider ─────────────────────────────────────── */
         .divider {
@@ -154,13 +160,13 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-            margin-top: 24px;
+            margin-top: 26px;
             padding-top: 14px;
             border-top: 1px solid #d1d5db;
         }
 
         .disclaimer {
-            font-size: 7.5pt;
+            font-size: 9pt;
             color: #9ca3af;
             font-style: italic;
             max-width: 65%;
@@ -172,17 +178,16 @@
         }
 
         .sig-line {
-            font-size: 9pt;
+            font-size: 10.5pt;
             color: #9ca3af;
             letter-spacing: 2px;
             margin-bottom: 4px;
         }
 
         .sig-label {
-            font-size: 8pt;
+            font-size: 10pt;
             font-weight: 600;
             color: #374151;
-            text-transform: uppercase;
             letter-spacing: 0.5px;
         }
     </style>
@@ -193,11 +198,11 @@
         <div class="header-inner">
             <div>
                 <div class="header-name">@Model.FullName</div>
-                <div class="header-subtitle">User Profile Report</div>
-                <div class="header-meta">Generated: @DateTime.Today.ToString("dd MMMM yyyy")</div>
+                <div class="header-subtitle">वापरकर्ता प्रोफाइल अहवाल</div>
+                <div class="header-meta">तयार केल्याची तारीख: @DateTime.Today.ToString("dd MMMM yyyy", mr)</div>
             </div>
             <div class="header-id">
-                <div class="id-label">User ID</div>
+                <div class="id-label">वापरकर्ता क्रमांक</div>
                 <div class="id-value">#@Model.Id</div>
             </div>
         </div>
@@ -209,19 +214,19 @@
         <div class="section">
             <div class="section-title">
                 <div class="section-title-bar"></div>
-                <div class="section-title-text">Personal Information</div>
+                <div class="section-title-text">वैयक्तिक माहिती</div>
             </div>
             <table class="info-table">
                 <tr>
-                    <td class="lbl">Full Name</td>
+                    <td class="lbl">पूर्ण नाव</td>
                     <td class="val">@Model.FullName</td>
-                    <td class="lbl">Gender</td>
+                    <td class="lbl">लिंग</td>
                     <td class="val">@Model.Gender</td>
                 </tr>
                 <tr>
-                    <td class="lbl">Date of Birth</td>
+                    <td class="lbl">जन्मतारीख</td>
                     <td class="val">@Model.DateOfBirth.ToString("dd/MM/yyyy")</td>
-                    <td class="lbl">Blood Group</td>
+                    <td class="lbl">रक्तगट</td>
                     <td class="val">@(string.IsNullOrWhiteSpace(Model.BloodGroup) ? "—" : Model.BloodGroup)</td>
                 </tr>
             </table>
@@ -230,25 +235,25 @@
         <div class="section">
             <div class="section-title">
                 <div class="section-title-bar"></div>
-                <div class="section-title-text">Contact Information</div>
+                <div class="section-title-text">संपर्क माहिती</div>
             </div>
             <table class="info-table">
                 <tr>
-                    <td class="lbl">Email</td>
+                    <td class="lbl">ईमेल</td>
                     <td class="val">@Model.Email</td>
-                    <td class="lbl">Phone</td>
+                    <td class="lbl">फोन</td>
                     <td class="val">@Model.Phone</td>
                 </tr>
                 <tr>
-                    <td class="lbl">Street</td>
+                    <td class="lbl">रस्ता / पत्ता</td>
                     <td class="val">@Model.Street</td>
-                    <td class="lbl">City</td>
+                    <td class="lbl">शहर</td>
                     <td class="val">@Model.City</td>
                 </tr>
                 <tr>
-                    <td class="lbl">State</td>
+                    <td class="lbl">राज्य</td>
                     <td class="val">@Model.State</td>
-                    <td class="lbl">Pin Code</td>
+                    <td class="lbl">पिन कोड</td>
                     <td class="val">@Model.PinCode</td>
                 </tr>
             </table>
@@ -259,11 +264,11 @@
             <div class="section">
                 <div class="section-title">
                     <div class="section-title-bar"></div>
-                    <div class="section-title-text">Emergency Contact</div>
+                    <div class="section-title-text">आपत्कालीन संपर्क</div>
                 </div>
                 <table class="info-table">
                     <tr>
-                        <td class="lbl">Contact</td>
+                        <td class="lbl">संपर्क</td>
                         <td class="val" colspan="3">@Model.EmergencyContact</td>
                     </tr>
                 </table>
@@ -275,7 +280,7 @@
             <div class="section">
                 <div class="section-title">
                     <div class="section-title-bar"></div>
-                    <div class="section-title-text">Description</div>
+                    <div class="section-title-text">वर्णन</div>
                 </div>
                 <table class="info-table">
                     <tr>
@@ -287,12 +292,12 @@
 
         <div class="footer">
             <div class="disclaimer">
-                This report is system-generated and is valid for official reference purposes only.
-                Any alterations render this document invalid.
+                हा अहवाल प्रणालीद्वारे स्वयंचलितपणे तयार करण्यात आला असून तो केवळ अधिकृत संदर्भासाठी वैध आहे.
+                यामध्ये कोणताही बदल केल्यास हा दस्तऐवज अवैध ठरेल.
             </div>
             <div class="signature">
                 <div class="sig-line">_ _ _ _ _ _ _ _ _ _ _ _ _</div>
-                <div class="sig-label">Authorised Signatory</div>
+                <div class="sig-label">अधिकृत स्वाक्षरीकर्ता</div>
             </div>
         </div>
 

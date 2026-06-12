@@ -1,0 +1,388 @@
+@model Project.Application.DTOs.User.UserDto
+@{
+    Layout = null;
+    var certNo = $"CERT-{Model.Id:D5}";
+    var issuedDate = DateTime.Now.ToString("d MMMM yyyy");
+    var year = DateTime.Now.Year.ToString();
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Certificate — @Model.FullName</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        width: 100%;
+        height: 100%;
+    }
+
+    body {
+        font-family: Georgia, 'Times New Roman', serif;
+        background: #f8f4ea;
+    }
+
+    /* ── Outer page shell — fills A4 landscape ── */
+    .page {
+        width: 100%;
+        min-height: 100%;
+        background: #f8f4ea;
+        display: table;        /* table keeps height:100% working in old WebKit */
+        padding: 0;
+    }
+
+    /* ── Certificate card ── */
+    .cert {
+        display: table-cell;
+        vertical-align: middle;
+        padding: 20px;
+    }
+
+    .card {
+        background: radial-gradient(ellipse at 50% 10%, #fffdf7 0%, #faf6ec 60%, #f0e9d6 100%);
+        border: 2.5px solid #b08d3c;
+        position: relative;
+        padding: 50px 70px 40px;
+        color: #1d2a4d;
+    }
+
+    /* Inner gold rule frame */
+    .card-inner-frame {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        bottom: 10px;
+        left: 10px;
+        border: 1px solid rgba(176, 141, 60, 0.45);
+        pointer-events: none;
+    }
+
+    /* Corner brackets */
+    .corner {
+        position: absolute;
+        width: 48px;
+        height: 48px;
+        border-color: #b08d3c;
+        border-style: solid;
+    }
+    .c-tl { top:  4px; left:  4px; border-width: 2px 0 0 2px; }
+    .c-tr { top:  4px; right: 4px; border-width: 2px 2px 0 0; }
+    .c-bl { bottom: 4px; left:  4px; border-width: 0 0 2px 2px; }
+    .c-br { bottom: 4px; right: 4px; border-width: 0 2px 2px 0; }
+
+    /* ── Content centred column ── */
+    .content {
+        text-align: center;
+    }
+
+    .issuer {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 9.5pt;
+        font-weight: bold;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        color: #8a6d2f;
+    }
+
+    .title-main {
+        font-size: 46pt;
+        font-weight: bold;
+        letter-spacing: 8px;
+        text-transform: uppercase;
+        color: #1d2a4d;
+        line-height: 1;
+        margin-top: 10px;
+    }
+
+    .title-sub {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 14pt;
+        letter-spacing: 10px;
+        font-weight: normal;
+        color: #b08d3c;
+        margin-top: 4px;
+    }
+
+    /* Gold divider with diamond */
+    .divider {
+        margin: 16px auto 12px;
+        width: 360px;
+        height: 14px;
+        position: relative;
+        display: block;
+    }
+    .divider-line {
+        position: absolute;
+        top: 6px;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: #b08d3c;
+    }
+    .divider-diamond {
+        position: absolute;
+        top: 1px;
+        left: 50%;
+        margin-left: -6px;
+        width: 12px;
+        height: 12px;
+        background: #b08d3c;
+        transform: rotate(45deg);
+    }
+
+    .presented {
+        font-style: italic;
+        font-size: 13pt;
+        color: #51607f;
+    }
+
+    /* Recipient name in elegant italic */
+    .recipient {
+        font-family: Georgia, 'Times New Roman', serif;
+        font-size: 40pt;
+        font-style: italic;
+        color: #1d2a4d;
+        line-height: 1.2;
+        margin: 8px 0 4px;
+    }
+
+    .name-rule {
+        width: 400px;
+        height: 1px;
+        background: linear-gradient(to right, transparent, #b08d3c 25%, #b08d3c 75%, transparent);
+        margin: 0 auto 14px;
+        display: block;
+    }
+
+    .citation {
+        font-size: 12pt;
+        line-height: 1.7;
+        color: #44516e;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .citation b {
+        color: #1d2a4d;
+        font-weight: bold;
+    }
+
+    /* ── Bottom row: two sig blocks + seal ── */
+    .bottom {
+        margin-top: 32px;
+        width: 100%;
+    }
+
+    /* Use table for reliable 3-column layout in wkhtmltopdf */
+    .bottom-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .sig-cell {
+        width: 30%;
+        text-align: center;
+        vertical-align: bottom;
+        padding-bottom: 4px;
+    }
+
+    .seal-cell {
+        width: 40%;
+        text-align: center;
+        vertical-align: bottom;
+        padding-bottom: 8px;
+    }
+
+    .sig-name-script {
+        font-family: Georgia, 'Palatino Linotype', serif;
+        font-style: italic;
+        font-size: 18pt;
+        color: #2c3a61;
+        margin-bottom: 2px;
+    }
+
+    .sig-line-rule {
+        border: none;
+        border-top: 1px solid #9aa3b8;
+        margin: 0 20px 5px;
+    }
+
+    .sig-name-label {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 8pt;
+        font-weight: bold;
+        letter-spacing: 1px;
+        color: #1d2a4d;
+        text-transform: uppercase;
+    }
+
+    .sig-role-label {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 7pt;
+        letter-spacing: 1px;
+        color: #8a93a8;
+        text-transform: uppercase;
+        margin-top: 2px;
+    }
+
+    /* ── Seal ── */
+    .seal-wrap {
+        display: inline-block;
+    }
+
+    .seal {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: #d4af4f;
+        border: 3px solid #a87f2c;
+        display: inline-block;
+        vertical-align: middle;
+        position: relative;
+    }
+
+    /* Inner dashed ring using a nested div (no ::before support needed) */
+    .seal-ring {
+        position: absolute;
+        top: 7px;
+        right: 7px;
+        bottom: 7px;
+        left: 7px;
+        border-radius: 50%;
+        border: 2px dashed rgba(255, 250, 220, 0.8);
+    }
+
+    .seal-content {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: table;
+        width: 100%;
+        height: 100%;
+    }
+
+    .seal-text-cell {
+        display: table-cell;
+        vertical-align: middle;
+        text-align: center;
+    }
+
+    .seal-label {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 7pt;
+        font-weight: bold;
+        letter-spacing: 1px;
+        color: #5c4413;
+        text-transform: uppercase;
+        line-height: 1.5;
+    }
+
+    .seal-year {
+        font-family: Georgia, serif;
+        font-size: 18pt;
+        font-weight: bold;
+        color: #4a3608;
+        line-height: 1;
+        display: block;
+    }
+
+    /* ── Meta footer ── */
+    .meta {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 7.5pt;
+        letter-spacing: 1.5px;
+        color: #9aa3b8;
+        text-transform: uppercase;
+        margin-top: 18px;
+        text-align: center;
+    }
+
+    @@page { size: A4 landscape; margin: 0; }
+</style>
+</head>
+<body>
+
+<div class="page">
+<div class="cert">
+<div class="card">
+
+    <!-- Corner brackets -->
+    <div class="corner c-tl"></div>
+    <div class="corner c-tr"></div>
+    <div class="corner c-bl"></div>
+    <div class="corner c-br"></div>
+    <div class="card-inner-frame"></div>
+
+    <div class="content">
+
+        <div class="issuer">Aurora Institute of Technology</div>
+
+        <div class="title-main">Certificate</div>
+        <div class="title-sub">of Achievement</div>
+
+        <div class="divider">
+            <div class="divider-line"></div>
+            <div class="divider-diamond"></div>
+        </div>
+
+        <div class="presented">This certificate is proudly presented to</div>
+
+        <div class="recipient">@Model.FullName</div>
+        <span class="name-rule"></span>
+
+        <p class="citation">
+            in recognition of successful enrollment and completion of the
+            <b>Registered User Program</b>, demonstrating outstanding commitment,
+            professionalism, and dedication throughout the duration of participation.
+        </p>
+
+        <div class="bottom">
+            <table class="bottom-table">
+                <tr>
+                    <td class="sig-cell">
+                        <div class="sig-name-script">R. Deshmukh</div>
+                        <hr class="sig-line-rule" />
+                        <div class="sig-name-label">Dr. R. Deshmukh</div>
+                        <div class="sig-role-label">Program Director</div>
+                    </td>
+
+                    <td class="seal-cell">
+                        <div class="seal-wrap">
+                            <div class="seal">
+                                <div class="seal-ring"></div>
+                                <div class="seal-content">
+                                    <div class="seal-text-cell">
+                                        <div class="seal-label">Official<br />Seal</div>
+                                        <span class="seal-year">@year</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td class="sig-cell">
+                        <div class="sig-name-script">S. Iyer</div>
+                        <hr class="sig-line-rule" />
+                        <div class="sig-name-label">Sunita Iyer</div>
+                        <div class="sig-role-label">Registrar</div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="meta">
+            Certificate No. @certNo &nbsp;&bull;&nbsp; Issued @issuedDate &nbsp;&bull;&nbsp; @Model.City
+        </div>
+
+    </div><!-- .content -->
+</div><!-- .card -->
+</div><!-- .cert -->
+</div><!-- .page -->
+
+</body>
+</html>
