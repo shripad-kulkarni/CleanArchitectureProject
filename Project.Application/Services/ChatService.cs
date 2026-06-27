@@ -37,7 +37,7 @@ namespace Project.Application.Services
             if (senderId == dto.ReceiverId)
                 return Result<ChatMessageDto>.Failure(Error.Validation("Chat.SelfMessage", "Cannot send a message to yourself."));
 
-            var message = ChatMessage.Create(senderId, dto.ReceiverId, dto.Content, dto.FileUrl, dto.FileName);
+            var message = new ChatMessage(senderId, dto.ReceiverId, dto.Content, dto.FileUrl, dto.FileName);
             await _repository.AddAsync(message, ct);
             await _unitOfWork.SaveChangesAsync(ct);
 

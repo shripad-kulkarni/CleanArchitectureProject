@@ -24,7 +24,7 @@ namespace Project.Application.Services
 
         public async Task<InfoSettingsDto> GetAsync(CancellationToken ct = default)
         {
-            var s = await _repo.FirstOrDefaultAsync(x => true, ct) ?? InfoSetting.CreateDefault();
+            var s = await _repo.FirstOrDefaultAsync(x => true, ct) ?? new InfoSetting(1, "Project Name");
             return ToDto(s);
         }
 
@@ -33,7 +33,7 @@ namespace Project.Application.Services
             var s = await _repo.FirstOrDefaultAsync(x => true, ct);
             if (s is null)
             {
-                s = InfoSetting.CreateDefault();
+                s = new InfoSetting(1, "Project Name");
                 await _repo.AddAsync(s, ct);
             }
 
@@ -49,7 +49,7 @@ namespace Project.Application.Services
             var s = await _repo.FirstOrDefaultAsync(x => true, ct);
             if (s is null)
             {
-                s = InfoSetting.CreateDefault();
+                s = new InfoSetting(1, "Project Name");
                 await _repo.AddAsync(s, ct);
             }
 

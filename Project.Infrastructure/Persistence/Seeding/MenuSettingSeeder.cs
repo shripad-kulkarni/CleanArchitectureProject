@@ -49,7 +49,7 @@ namespace Project.Infrastructure.Persistence.Seeding
             {
                 foreach (var role in RoleConstants.AllRoles)
                 {
-                    settings.Add(MenuSetting.Create(
+                    settings.Add(new MenuSetting(
                         menu.Key,
                         menu.Label,
                         menu.Icon,

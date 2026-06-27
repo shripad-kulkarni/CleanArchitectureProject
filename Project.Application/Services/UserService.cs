@@ -60,7 +60,7 @@ namespace Project.Application.Services
                 return Result<UserDto>.Failure(Error.Validation("User.InvalidGender",
                     "Gender must be Male, Female, or Other."));
 
-            var user = User.Create(
+            var user = new User(
                 dto.FirstName, dto.LastName, dto.Email, dto.PhoneNumber,
                 dto.DateOfBirth, gender,
                 dto.Street, dto.City, dto.State, dto.PinCode,
@@ -198,7 +198,7 @@ namespace Project.Application.Services
                     $"File size must not exceed {DocumentConstants.MaxFileSizeInMb} MB."));
 
             var storedPath = await _fileStorage.UploadAsync(fileStream, fileName, $"users/{userId}", ct);
-            var document = UserDocument.Create(userId, docType, fileName, storedPath, fileSizeInBytes);
+            var document = new UserDocument(userId, docType, fileName, storedPath, fileSizeInBytes);
             user.AddDocument(document);
 
             _repository.Update(user);

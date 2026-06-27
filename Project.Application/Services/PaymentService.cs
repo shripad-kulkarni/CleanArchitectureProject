@@ -44,7 +44,7 @@ namespace Project.Application.Services
                     Error.Failure("Payment.GatewayError", $"Payment gateway error: {ex.Message}"));
             }
 
-            var payment = Payment.Create(dto.Amount, dto.Currency, gatewayResult.GatewayOrderId, dto.Receipt);
+            var payment = new Payment(dto.Amount, dto.Currency, gatewayResult.GatewayOrderId, dto.Receipt);
             await _repository.AddAsync(payment, ct);
             await _unitOfWork.SaveChangesAsync(ct);
 

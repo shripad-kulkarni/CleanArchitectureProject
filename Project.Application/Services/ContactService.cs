@@ -82,7 +82,7 @@ namespace Project.Application.Services
                 return Result.Failure(
                     Error.ValidationErrors("Contact.Validation", validation.Errors.Select(e => e.ErrorMessage)));
 
-            var message = ContactMessage.Create(dto.Name, dto.Email, dto.Phone, dto.Subject, dto.Message);
+            var message = new ContactMessage(dto.Name, dto.Email, dto.Phone, dto.Subject, dto.Message);
             await _repository.AddAsync(message, ct);
             await _unitOfWork.SaveChangesAsync(ct);
 
