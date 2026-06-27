@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Project.Domain.Aggregates;
-using Project.Domain.Aggregates.ChatAggregate;
-using Project.Domain.Aggregates.ContactAggregate;
 using Project.Domain.Aggregates.PaymentAggregate;
 using Project.Domain.Aggregates.UserAggregate;
 using Project.Domain.Entities;

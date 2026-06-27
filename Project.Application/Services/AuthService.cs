@@ -58,7 +58,7 @@ namespace Project.Application.Services
         public async Task<AuthResult> RegisterAsync(
             string email, string password,
             string firstName, string lastName,
-            string role, CancellationToken ct = default)
+            string role, string? phone = null, CancellationToken ct = default)
         {
             var existing = await _userManager.FindByEmailAsync(email);
             if (existing is not null)
@@ -70,6 +70,7 @@ namespace Project.Application.Services
                 Email = email,
                 FirstName = firstName,
                 LastName = lastName,
+                PhoneNumber = phone,
                 IsActive = true
             };
 

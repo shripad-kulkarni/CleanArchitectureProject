@@ -12,6 +12,7 @@ using Project.Application.Pagination;
 using Project.Application.Specifications.Users;
 using Project.Domain.Aggregates.UserAggregate;
 using Project.Domain.Constants;
+using Project.Domain.Entities;
 using Project.Domain.Enums;
 
 namespace Project.Application.Services

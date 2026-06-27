@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using FluentValidation;
 using Project.Application.Abstractions.ExternalServices;
 using Project.Application.Abstractions.Persistence;
@@ -5,7 +6,9 @@ using Project.Application.Abstractions.Services;
 using Project.Application.Common.Errors;
 using Project.Application.Common.Result;
 using Project.Application.DTOs.Contact;
-using Project.Domain.Aggregates.ContactAggregate;
+using Project.Application.Mapper;
+using Project.Application.Pagination;
+using Project.Domain.Entities;
 
 namespace Project.Application.Services
 {
@@ -29,6 +32,47 @@ namespace Project.Application.Services
             _validator = validator;
             _emailService = emailService;
             _settingsService = settingsService;
+        }
+
+        public async Task<Result<PagedList<ContactMessageDto>>> GetAllAsync(ContactFilterDto filter, CancellationToken ct = default)
+        {
+            var predicates = new List<Expression<Func<ContactMessage, bool>>>();
+
+            if (!string.IsNullOrWhiteSpace(filter.Search))
+            {
+                var search = filter.Search.ToLower();
+                predicates.Add(m => m.Name.ToLower().Contains(search)
+                                 || m.Email.ToLower().Contains(search)
+                                 || m.Subject.ToLower().Contains(search));
+            }
+
+            if (filter.IsRead.HasValue)
+                predicates.Add(m => m.IsRead == filter.IsRead.Value);
+
+            if (filter.DateFrom.HasValue)
+                predicates.Add(m => DateOnly.FromDateTime(m.CreatedAt) >= filter.DateFrom.Value);
+
+            if (filter.DateTo.HasValue)
+                predicates.Add(m => DateOnly.FromDateTime(m.CreatedAt) <= filter.DateTo.Value);
+
+            var (items, totalCount) = await _repository.ListPagedAsync(
+                predicates,
+                m => m.CreatedAt,
+                filter.PageNumber,
+                filter.PageSize,
+                ct);
+
+            var dtos = items.Select(ContactMapper.ToDto).ToList();
+            return Result<PagedList<ContactMessageDto>>.Success(
+                new PagedList<ContactMessageDto>(dtos, totalCount, filter.PageNumber, filter.PageSize));
+        }
+
+        public async Task<Result<ContactMessageDto>> GetByIdAsync(int id, CancellationToken ct = default)
+        {
+            var message = await _repository.GetByIdAsync(id, ct);
+            if (message is null)
+                return Result<ContactMessageDto>.Failure(Error.NotFound("Contact.NotFound", $"Contact message {id} not found."));
+            return Result<ContactMessageDto>.Success(ContactMapper.ToDto(message));
         }
 
         public async Task<Result> SubmitAsync(CreateContactMessageDto dto, CancellationToken ct = default)

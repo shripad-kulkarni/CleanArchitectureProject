@@ -5,7 +5,7 @@ using Project.Domain.Primitives;
 
 namespace Project.Infrastructure.Persistence
 {
-    public static class SpecificationEvaluator<T> where T : AggregateRoot
+    public static class SpecificationEvaluator<T> where T : Entity
     {
         private static readonly MethodInfo _includeMethod =
             typeof(EntityFrameworkQueryableExtensions)

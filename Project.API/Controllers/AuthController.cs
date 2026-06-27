@@ -50,6 +50,7 @@ namespace Project.API.Controllers
                 request.FirstName,
                 request.LastName,
                 request.Role,
+                request.Phone,
                 ct);
 
             if (!result.IsSuccess)
@@ -102,7 +103,7 @@ namespace Project.API.Controllers
     }
 
     public record LoginRequest(string Email, string Password);
-    public record RegisterRequest(string Email, string Password, string FirstName, string LastName, string Role);
+    public record RegisterRequest(string Email, string Password, string FirstName, string LastName, string Role, string? Phone = null);
     public record InviteUserRequest(string Email, string FirstName, string LastName, string Role);
     public record SetPasswordRequest(string Email, string Token, string NewPassword);
     public record RefreshTokenRequest(string Token);

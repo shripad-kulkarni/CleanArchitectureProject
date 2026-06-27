@@ -2,11 +2,11 @@ using Project.Domain.Primitives;
 
 namespace Project.Domain.Entities
 {
-    public sealed class InfoSetting : AggregateRoot
+    public sealed class InfoSetting : Entity
     {
         private InfoSetting() { }
 
-        private InfoSetting(int id, string name) : base(id)
+        public InfoSetting(int id, string name) : base(id)
         {
             Name = name;
         }
@@ -16,8 +16,6 @@ namespace Project.Domain.Entities
         public string? Address { get; private set; }
         public string? PhoneNumber { get; private set; }
         public string? Email { get; private set; }
-
-        public static InfoSetting CreateDefault() => new(1, "Project Name");
 
         public void Update(string name, string? address, string? phoneNumber, string? email)
         {

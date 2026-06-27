@@ -6,7 +6,7 @@ using Project.Application.Common.Errors;
 using Project.Application.Common.Result;
 using Project.Application.DTOs.Chat;
 using Project.Application.Specifications.Chat;
-using Project.Domain.Aggregates.ChatAggregate;
+using Project.Domain.Entities;
 using Project.Domain.Constants;
 
 namespace Project.Application.Services

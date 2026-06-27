@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Project.Infrastructure.Persistence;
 
@@ -10,9 +11,11 @@ using Project.Infrastructure.Persistence;
 namespace Project.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260619040924_AddNestedMenuSettings")]
+    partial class AddNestedMenuSettings
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -220,7 +223,7 @@ namespace Project.Infrastructure.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("Project.Domain.Entities.ChatMessage", b =>
+            modelBuilder.Entity("Project.Domain.Aggregates.ChatAggregate.ChatMessage", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -282,7 +285,7 @@ namespace Project.Infrastructure.Migrations
                     b.ToTable("ChatMessages", (string)null);
                 });
 
-            modelBuilder.Entity("Project.Domain.Entities.ContactMessage", b =>
+            modelBuilder.Entity("Project.Domain.Aggregates.ContactAggregate.ContactMessage", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -510,7 +513,7 @@ namespace Project.Infrastructure.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
-            modelBuilder.Entity("Project.Domain.Entities.UserDocument", b =>
+            modelBuilder.Entity("Project.Domain.Aggregates.UserAggregate.UserDocument", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -731,7 +734,7 @@ namespace Project.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Project.Domain.Entities.UserDocument", b =>
+            modelBuilder.Entity("Project.Domain.Aggregates.UserAggregate.UserDocument", b =>
                 {
                     b.HasOne("Project.Domain.Aggregates.UserAggregate.User", null)
                         .WithMany("Documents")

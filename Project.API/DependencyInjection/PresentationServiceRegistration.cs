@@ -1,4 +1,6 @@
-﻿using Project.API.Extensions;
+﻿using System.Text.Json.Serialization;
+using Project.API.Converters;
+using Project.API.Extensions;
 using Project.API.Handlers;
 using Project.API.Versioning;
 
@@ -10,7 +12,12 @@ namespace Project.API.DependencyInjection
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.AddControllersWithViews();
+            services.AddControllersWithViews()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new UtcDateTimeJsonConverter());
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                });
             services.AddEndpointsApiExplorer();
 
             services.AddApiVersioningConfig();

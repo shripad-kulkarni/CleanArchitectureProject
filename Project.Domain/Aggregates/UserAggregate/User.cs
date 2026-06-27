@@ -1,3 +1,4 @@
+using Project.Domain.Entities;
 using Project.Domain.Enums;
 using Project.Domain.Primitives;
 
@@ -8,6 +9,38 @@ namespace Project.Domain.Aggregates.UserAggregate
         private readonly List<UserDocument> _documents = [];
 
         private User() { }
+
+        public User(
+            string firstName,
+            string lastName,
+            string email,
+            string phone,
+            DateOnly dateOfBirth,
+            Gender gender,
+            string street,
+            string city,
+            string state,
+            string pinCode,
+            string country = "India",
+            string? bloodGroup = null,
+            string? emergencyContact = null,
+            string? description = null)
+        {
+            FirstName        = firstName;
+            LastName         = lastName;
+            Email            = email.ToLowerInvariant();
+            Phone            = phone;
+            DateOfBirth      = dateOfBirth;
+            Gender           = gender;
+            Street           = street;
+            City             = city;
+            State            = state;
+            PinCode          = pinCode;
+            Country          = country;
+            BloodGroup       = bloodGroup;
+            EmergencyContact = emergencyContact;
+            Description      = description;
+        }
 
         public string FirstName { get; private set; } = string.Empty;
         public string LastName { get; private set; } = string.Empty;
@@ -29,44 +62,6 @@ namespace Project.Domain.Aggregates.UserAggregate
         public string? IntroVideoUrl { get; private set; }
 
         public IReadOnlyCollection<UserDocument> Documents => _documents.AsReadOnly();
-
-        public static User Create(
-            string firstName,
-            string lastName,
-            string email,
-            string phone,
-            DateOnly dateOfBirth,
-            Gender gender,
-            string street,
-            string city,
-            string state,
-            string pinCode,
-            string country = "India",
-            string? bloodGroup = null,
-            string? emergencyContact = null,
-            string? description = null)
-        {
-            if (string.IsNullOrWhiteSpace(firstName)) throw new ArgumentException("First name is required.");
-            if (string.IsNullOrWhiteSpace(lastName)) throw new ArgumentException("Last name is required.");
-
-            return new User
-            {
-                FirstName = firstName,
-                LastName = lastName,
-                Email = email.ToLowerInvariant(),
-                Phone = phone,
-                DateOfBirth = dateOfBirth,
-                Gender = gender,
-                Street = street,
-                City = city,
-                State = state,
-                PinCode = pinCode,
-                Country = country,
-                BloodGroup = bloodGroup,
-                EmergencyContact = emergencyContact,
-                Description = description
-            };
-        }
 
         public void Update(
             string firstName,

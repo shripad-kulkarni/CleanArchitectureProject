@@ -1,4 +1,4 @@
-using Project.Domain.Aggregates.ChatAggregate;
+using Project.Domain.Entities;
 
 namespace Project.Application.Specifications.Chat
 {
