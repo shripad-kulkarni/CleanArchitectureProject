@@ -1,5 +1,6 @@
 using FluentValidation;
 using Project.Application.Abstractions.ExternalServices;
+using Project.Application.Abstractions.Identity;
 using Project.Application.Abstractions.Persistence;
 using Project.Application.Abstractions.Services;
 using Project.Application.Common.Errors;
@@ -25,6 +26,7 @@ namespace Project.Application.Services
         private readonly IFileStorageService _fileStorage;
         private readonly IUserProfileReportService _profileReportService;
         private readonly ICertificateService _certificateService;
+        private readonly IIdentityUserLookupService _identityLookup;
 
         public UserService(
             IRepository<User> repository,
@@ -32,7 +34,8 @@ namespace Project.Application.Services
             IValidator<CreateUserDto> createValidator,
             IFileStorageService fileStorage,
             IUserProfileReportService profileReportService,
-            ICertificateService certificateService)
+            ICertificateService certificateService,
+            IIdentityUserLookupService identityLookup)
         {
             _repository = repository;
             _unitOfWork = unitOfWork;
@@ -40,6 +43,7 @@ namespace Project.Application.Services
             _fileStorage = fileStorage;
             _profileReportService = profileReportService;
             _certificateService = certificateService;
+            _identityLookup = identityLookup;
         }
 
         public async Task<Result<UserDto>> CreateAsync(CreateUserDto dto,
@@ -98,14 +102,19 @@ namespace Project.Application.Services
             if (user is null)
                 return Result<UserDto>.Failure(Error.NotFound("User.NotFound", $"User with id {id} was not found."));
 
-            return Result<UserDto>.Success(UserMapper.ToDto(user));
+            var activeMap = await _identityLookup.GetActiveStatusByEmailsAsync([user.Email], ct);
+            var isActive = activeMap.GetValueOrDefault(user.Email, true);
+            return Result<UserDto>.Success(UserMapper.ToDto(user, isActive));
         }
 
         public async Task<Result<PagedList<UserDto>>> GetAllAsync(UserFilterDto filter, CancellationToken ct = default)
         {
             var totalCount = await _repository.CountAsync(new UserCountSpecification(filter), ct);
             var users = await _repository.ListAsync(new UserFilterSpecification(filter), ct);
-            var dtos = users.Select(UserMapper.ToDto).ToList();
+
+            var activeMap = await _identityLookup.GetActiveStatusByEmailsAsync(users.Select(u => u.Email), ct);
+            var dtos = users.Select(u => UserMapper.ToDto(u, activeMap.GetValueOrDefault(u.Email, true))).ToList();
+
             return Result<PagedList<UserDto>>.Success(new PagedList<UserDto>(dtos, totalCount, filter.PageNumber, filter.PageSize));
         }
 
@@ -136,9 +145,9 @@ namespace Project.Application.Services
 
             _repository.Update(user);
             await _unitOfWork.SaveChangesAsync(ct);
-            var user1 = await _repository.FirstOrDefaultAsync(new UserByIdSpecification(id), ct);
+            var updated = await _repository.FirstOrDefaultAsync(new UserByIdSpecification(id), ct);
 
-            return Result<UserDto>.Success(UserMapper.ToDto(user1));
+            return Result<UserDto>.Success(UserMapper.ToDto(updated!));
         }
 
         public async Task<Result> DeleteAsync(int id, CancellationToken ct = default)
@@ -151,6 +160,7 @@ namespace Project.Application.Services
             await _unitOfWork.SaveChangesAsync(ct);
             return Result.Success();
         }
+
 
         public async Task<Result<UserDto>> UpdateProfileAsync(int userId, UpdateUserProfileDto dto, CancellationToken ct = default)
         {

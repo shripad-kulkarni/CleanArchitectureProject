@@ -12,6 +12,13 @@ namespace Project.Application.Abstractions.Identity
             CancellationToken ct = default);
 
         /// <summary>
+        /// Returns a map of email → IsActive for the given emails.
+        /// </summary>
+        Task<Dictionary<string, bool>> GetActiveStatusByEmailsAsync(
+            IEnumerable<string> emails,
+            CancellationToken ct = default);
+
+        /// <summary>
         /// Returns all active Identity users except the caller — used to populate the chat contact list.
         /// </summary>
         Task<List<ChatUserDto>> GetAllChatUsersAsync(string currentIdentityId, CancellationToken ct = default);

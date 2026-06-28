@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Project.API.Controllers.Base;
 using Project.API.CustomResults;
+using Project.Application.Abstractions.Identity;
 using Project.Application.Abstractions.Services;
 using Project.Application.DTOs.User;
+using Project.Domain.Constants;
 
 namespace Project.API.Controllers
 {
@@ -14,10 +16,12 @@ namespace Project.API.Controllers
     public sealed class UsersController : ApiControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IAuthService _authService;
 
-        public UsersController(IUserService userService)
+        public UsersController(IUserService userService, IAuthService authService)
         {
             _userService = userService;
+            _authService = authService;
         }
 
         [HttpPost]
@@ -147,6 +151,32 @@ namespace Project.API.Controllers
             var result = await _userService.DeleteAsync(id, ct);
             if (result.IsFailure) return ToErrorResponse(result.Error);
             return NoContent();
+        }
+
+        [HttpPatch("{id:int}/activate")]
+        [Authorize(Roles = RoleConstants.Admin)]
+        public async Task<IActionResult> Activate(int id, CancellationToken ct)
+        {
+            var userResult = await _userService.GetByIdAsync(id, ct);
+            if (userResult.IsFailure) return ToErrorResponse(userResult.Error);
+
+            var result = await _authService.SetUserActiveAsync(userResult.Value.Email, true, ct);
+            if (!result.IsSuccess) return BadRequest(ApiResponse.Failure(result.Error ?? "Failed to activate user."));
+
+            return Ok(ApiResponse.Success("User activated."));
+        }
+
+        [HttpPatch("{id:int}/deactivate")]
+        [Authorize(Roles = RoleConstants.Admin)]
+        public async Task<IActionResult> Deactivate(int id, CancellationToken ct)
+        {
+            var userResult = await _userService.GetByIdAsync(id, ct);
+            if (userResult.IsFailure) return ToErrorResponse(userResult.Error);
+
+            var result = await _authService.SetUserActiveAsync(userResult.Value.Email, false, ct);
+            if (!result.IsSuccess) return BadRequest(ApiResponse.Failure(result.Error ?? "Failed to deactivate user."));
+
+            return Ok(ApiResponse.Success("User deactivated."));
         }
 
         [HttpPut("{id:int}/profile")]

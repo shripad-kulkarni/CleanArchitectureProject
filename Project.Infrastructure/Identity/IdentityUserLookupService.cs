@@ -31,6 +31,20 @@ namespace Project.Infrastructure.Identity
             return result;
         }
 
+        public async Task<Dictionary<string, bool>> GetActiveStatusByEmailsAsync(
+            IEnumerable<string> emails,
+            CancellationToken ct = default)
+        {
+            var emailList = emails.Select(e => e.ToLowerInvariant()).ToList();
+
+            return await _userManager.Users
+                .Where(u => emailList.Contains(u.NormalizedEmail!.ToLower()))
+                .ToDictionaryAsync(
+                    u => u.Email!.ToLowerInvariant(),
+                    u => u.IsActive,
+                    ct);
+        }
+
         public async Task<List<ChatUserDto>> GetAllChatUsersAsync(
             string currentIdentityId,
             CancellationToken ct = default)

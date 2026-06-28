@@ -12,6 +12,7 @@ namespace Project.Application.DTOs.User
         string City,
         string State,
         string PinCode,
+        bool IsActive = true,
         string? BloodGroup = null,
         string? EmergencyContact = null,
         string? Description = null,

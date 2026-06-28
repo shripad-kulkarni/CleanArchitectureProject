@@ -6,7 +6,7 @@ namespace Project.Application.Mapper
 {
     public static class UserMapper
     {
-        public static UserDto ToDto(User user)
+        public static UserDto ToDto(User user, bool isActive = true)
         {
             return new UserDto(
                 Id: user.Id,
@@ -20,6 +20,7 @@ namespace Project.Application.Mapper
                 City: user.City,
                 State: user.State,
                 PinCode: user.PinCode,
+                IsActive: isActive,
                 BloodGroup: user.BloodGroup,
                 EmergencyContact: user.EmergencyContact,
                 Description: user.Description,
